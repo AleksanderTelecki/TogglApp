@@ -38,9 +38,19 @@ namespace Toggl_API
 
             var helper = new Helper();
             Debug.WriteLine(helper.GetClientProjectTimeTrack("Klient 1", "07/05/2021", "07/08/2021"));
-            //Debug.WriteLine("");
-            //Debug.WriteLine(helper.GetTotalProjectWorkTime(helper.Projects[0], "07/05/2021", "07/08/2021"));
+            Debug.WriteLine("");
+            Debug.WriteLine(helper.GetTotalProjectWorkTime(helper.Projects[0], "07/05/2021", "07/08/2021"));
             LoadBarChartData(helper.GetProjectChart(helper.Projects[0]));
+
+
+            
+
+
+
+
+
+
+
 
         }
 
@@ -66,10 +76,6 @@ namespace Toggl_API
         // xmlns:DVC="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Compatible;assembly=DotNetProjects.DataVisualization.Toolkit"
         // xmlns:DVC="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives;assembly=DotNetProjects.DataVisualization.Toolkit"
 
-        //WorkSpace
-        //var WSService = new Toggl.Services.WorkspaceService(apiKey);
-        //var listwork = WSService.List();
-        //var workspaceID = listwork[0].Id;
 
 
         //Project
@@ -85,35 +91,10 @@ namespace Toggl_API
         //var act = PService.Add(project);
 
 
-        //Add Task
-        //TService.Add(new Toggl.Task
-        //{
-        //    IsActive = true,
-        //    Name = "Test 1",
-        //    EstimatedSeconds = 3600,
-        //    WorkspaceId = WorkspaceID,
-        //    ProjectId = ProjectID
-        //});
 
 
 
-        //Lastjob
-        //var TService = new Toggl.Services.TaskService(apiKey);
 
-
-        //var tasks = TService.ForProject((int)ProjectID);
-
-        //var TEService = new Toggl.Services.TimeEntryService(apiKey);
-        //var timeEntry = TEService.Add(new TimeEntry()
-        //{
-        //    IsBillable = true,
-        //    CreatedWith = "TogglAPI.Net",
-        //    Duration = 900,
-        //    Start = DateTime.Now.ToIsoDateStr(),
-        //    WorkspaceId = WorkspaceID,
-        //    ProjectId=ProjectID,
-        //    TaskId = tasks[1].Id
-        //});
 
 
 
@@ -122,6 +103,39 @@ namespace Toggl_API
         //var loadedTask = TService.Get((int)task[0].Id);
         //loadedTask.IsActive = false;
         //var editedTask = TService.Edit(loadedTask);
+
+        //helper.AddTask((int) helper.Projects[0].Id, "Requirements Specification",true,3600*20);
+        //    helper.AddTask((int) helper.Projects[0].Id, "Project Planning", true, 3600*10);
+        //    helper.AddTask((int) helper.Projects[0].Id, "System Creation", true, 3600*70);
+        //    helper.AddTask((int) helper.Projects[0].Id, "DataBase Creation", true, 3600*30);
+        //    helper.AddTask((int) helper.Projects[0].Id, "BugFixing", true, 3600*35);
+        //    helper.AddTask((int) helper.Projects[0].Id, "Testing", true, 3600*25);
+
+        //    helper.AddTask((int) helper.Projects[1].Id, "Requirements Specification", true, 3600*20);
+        //    helper.AddTask((int) helper.Projects[1].Id, "Project Planning", true, 3600*12);
+        //    helper.AddTask((int) helper.Projects[1].Id, "System Designing", true, 3600*15);
+        //    helper.AddTask((int) helper.Projects[1].Id, "Server Creation", true, 3600*30);
+        //    helper.AddTask((int) helper.Projects[1].Id, "Web-Services Configuration", true, 3600*35);
+        //    helper.AddTask((int) helper.Projects[1].Id, "System Configuration", true, 3600*10);
+        //    helper.AddTask((int) helper.Projects[1].Id, "Testing", true, 3600*10);
+
+        //helper.AddTimeEntries(helper.Projects[0], "Requirements Specification", 3600 * 1, "Client Meeting 0.1");
+        //helper.AddTimeEntries(helper.Projects[0], "Project Planning", 3600 * 2, "Gant Diagram 0.1");
+        //helper.AddTimeEntries(helper.Projects[0], "System Creation", 3600 * 4, "System Main UseCase 0.1");
+        //helper.AddTimeEntries(helper.Projects[0], "DataBase Creation", 3600 * 5, "Entity Diagram 0.1");
+        //helper.AddTimeEntries(helper.Projects[0], "BugFixing", 3600 * 1, "System Check 0.1");
+        //helper.AddTimeEntries(helper.Projects[0], "Testing", 3600 * 1, "Testing 0.1");
+
+
+
+        //helper.AddTimeEntries(helper.Projects[1], "Requirements Specification", 3600 * 2, "Client Meeting 0.1");
+        //helper.AddTimeEntries(helper.Projects[1], "Project Planning", 3600 * 3, "Main Project Plan 0.1");
+        //helper.AddTimeEntries(helper.Projects[1], "System Designing", 3600 * 4, "Designer UI Template 0.1");
+        //helper.AddTimeEntries(helper.Projects[1], "Server Creation", 3600 * 5, "Server Creation 0.1");
+        //helper.AddTimeEntries(helper.Projects[1], "Web-Services Configuration", 3600 * 5, "Adding WebServices 0.1");
+        //helper.AddTimeEntries(helper.Projects[1], "System Configuration", 3600 * 3, "System Configuration 0.1");
+        //helper.AddTimeEntries(helper.Projects[1], "Testing", 3600 * 2, "Testing 0.1");
+
 
     }
 }

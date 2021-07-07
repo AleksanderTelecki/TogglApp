@@ -160,6 +160,13 @@ namespace Toggl_API.APIHelper
 
         }
 
+        private int GetTaskIDByName(string taskName,Project project)
+        {
+
+
+            return (int)TaskService.ForProject((int)project.Id).First(w => w.Name == taskName).Id;
+        }
+
         public void AddTask(int projectId,string taskName,bool isActive,int estimatedseconds)
         {
             
@@ -194,6 +201,34 @@ namespace Toggl_API.APIHelper
 
         }
 
+        public void AddTimeEntries(Project project, string taskName, int duration, string description)
+        {
+
+            TimeEntryService.Add(new TimeEntry()
+            {
+                IsBillable = true,
+                CreatedWith = "TogglAPI.Net",
+                Duration = duration,
+                Start = DateTime.Now.ToIsoDateStr(),
+                WorkspaceId = WorkSpaceID,
+                ProjectId = project.Id,
+                TaskId = GetTaskIDByName(taskName,project),
+                Description = description
+            });
+
+        }
+
+        public void RemoveProjectTasks(int projectId)
+        {
+            var projecttasks = TaskService.ForProject(projectId);
+            foreach (var item in projecttasks)
+            {
+                TaskService.Delete((int)item.Id);
+            }
+
+        }
+
+       
 
 
 
