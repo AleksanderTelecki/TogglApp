@@ -37,15 +37,14 @@ namespace Toggl_API
          
 
             var helper = new Helper();
-            Debug.WriteLine(helper.GetClientProjectTimeTrack("Klient 1", "07/05/2021", "07/07/2021"));
-
-            
-
+            Debug.WriteLine(helper.GetClientProjectTimeTrack("Klient 1", "07/05/2021", "07/08/2021"));
+            Debug.WriteLine("");
+            Debug.WriteLine(helper.GetTotalProjectWorkTime(helper.Projects[0], "07/05/2021", "07/08/2021"));
 
         }
 
 
-     
+
 
 
 
