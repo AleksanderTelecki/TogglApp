@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Toggl;
 using Toggl.Extensions;
 using Toggl.QueryObjects;
+using Toggl_API.APIHelper.ChartClasses;
 
 namespace Toggl_API.APIHelper
 {
@@ -119,13 +120,36 @@ namespace Toggl_API.APIHelper
                 result.AppendLine($"          {item.Description}");
             }
 
-
-
-
-
-
-
             return result.ToString();
+
+        }
+
+        public ProjectChart GetProjectChart(Toggl.Project project)
+        {
+
+           
+            var prams = new TimeEntryParams();
+
+            prams.StartDate = DateTime.Now.AddDays(-1);
+            prams.EndDate = DateTime.Now;
+
+            var hours = TimeEntryService.List(prams);
+
+            var choosedtimestamp = hours.Where(w => w.ProjectId == project.Id).ToList();
+
+            var projectChart = new ProjectChart(project.Name);
+          
+
+
+            foreach (var item in choosedtimestamp)
+            {
+                projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours);
+            }
+
+
+
+
+            return projectChart;
 
         }
 

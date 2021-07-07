@@ -4,14 +4,24 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Toggl_API"
+       xmlns:DVC="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=DotNetProjects.DataVisualization.Toolkit"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="600">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="0.0*"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <TextBlock FontSize="30" x:Name="T_FullName"/>
-        <TextBlock FontSize="30" Grid.Row="1" x:Name="T_Email"/>
+
+        <DVC:Chart Grid.Row="1" Name="mcChart"
+           Background="LightGray">
+            <DVC:Chart.Series>
+                <DVC:BarSeries Title="Project Tasks"    
+            IndependentValueBinding="{Binding Path=Key}"
+            DependentValueBinding="{Binding Path=Value}">
+                </DVC:BarSeries>
+            </DVC:Chart.Series>
+        </DVC:Chart>
+
     </Grid>
 </Window>

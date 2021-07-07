@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.DataVisualization.Charting;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -18,8 +19,7 @@ using Toggl.Extensions;
 using Toggl.QueryObjects;
 using Toggl_API;
 using Toggl_API.APIHelper;
-
-
+using Toggl_API.APIHelper.ChartClasses;
 
 namespace Toggl_API
 {
@@ -38,18 +38,33 @@ namespace Toggl_API
 
             var helper = new Helper();
             Debug.WriteLine(helper.GetClientProjectTimeTrack("Klient 1", "07/05/2021", "07/08/2021"));
-            Debug.WriteLine("");
-            Debug.WriteLine(helper.GetTotalProjectWorkTime(helper.Projects[0], "07/05/2021", "07/08/2021"));
+            //Debug.WriteLine("");
+            //Debug.WriteLine(helper.GetTotalProjectWorkTime(helper.Projects[0], "07/05/2021", "07/08/2021"));
+            LoadBarChartData(helper.GetProjectChart(helper.Projects[0]));
+
+        }
+
+
+        private void LoadBarChartData(ProjectChart projectChart)
+        {
+
+            List<KeyValuePair<string, double>> keyValuePairs = new List<KeyValuePair<string, double>>();
+            foreach (var item in projectChart.TimePerTasks)
+            {
+                keyValuePairs.Add(new KeyValuePair<string, double>(item.Description,item.Time));
+            }
+
+            ((BarSeries)mcChart.Series[0]).ItemsSource = keyValuePairs;
+            mcChart.Title = projectChart.ProjectName;
+
 
         }
 
 
 
 
-
-
-
-
+        // xmlns:DVC="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Compatible;assembly=DotNetProjects.DataVisualization.Toolkit"
+        // xmlns:DVC="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives;assembly=DotNetProjects.DataVisualization.Toolkit"
 
         //WorkSpace
         //var WSService = new Toggl.Services.WorkspaceService(apiKey);
