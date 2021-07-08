@@ -13,13 +13,13 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
-        <DVC:Chart Grid.Row="1" Name="mcChart"
+        <DVC:Chart  Cursor="Cross" Title="Projects"  Grid.Row="1" Name="mcChart"
            Background="LightGray">
             <DVC:Chart.Series>
-                <DVC:BarSeries Title="Project Tasks"    
-            IndependentValueBinding="{Binding Path=Key}"
-            DependentValueBinding="{Binding Path=Value}">
-                </DVC:BarSeries>
+                <DVC:ColumnSeries IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">
+                </DVC:ColumnSeries>
+                <DVC:ColumnSeries  IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">
+                </DVC:ColumnSeries>
             </DVC:Chart.Series>
         </DVC:Chart>
 

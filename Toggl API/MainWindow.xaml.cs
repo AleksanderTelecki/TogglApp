@@ -37,35 +37,28 @@ namespace Toggl_API
          
 
             var helper = new Helper();
-            Debug.WriteLine(helper.GetClientProjectTimeTrack("Klient 1", "07/05/2021", "07/08/2021"));
-            Debug.WriteLine("");
-            Debug.WriteLine(helper.GetTotalProjectWorkTime(helper.Projects[0], "07/05/2021", "07/08/2021"));
-            LoadBarChartData(helper.GetProjectChart(helper.Projects[0]));
-
-
-            
-
-
-
-
-
-
+            Trace.WriteLine(helper.GetClientProjectTimeTrack("Klient 1", "07/05/2021", "07/08/2021"));
+            Trace.WriteLine("");
+            Trace.WriteLine(helper.GetTotalProjectWorkTime(helper.Projects[0], "07/05/2021", "07/08/2021"));
+            LoadBarChartData(helper.GetProjectChart(helper.Projects[0]), helper.GetProjectChart(helper.Projects[1]));
 
 
         }
 
 
-        private void LoadBarChartData(ProjectChart projectChart)
+        private void LoadBarChartData(params ProjectChart[] projects)
         {
 
             List<KeyValuePair<string, double>> keyValuePairs = new List<KeyValuePair<string, double>>();
-            foreach (var item in projectChart.TimePerTasks)
+            for (int i = 0; i < projects.Length; i++)
             {
-                keyValuePairs.Add(new KeyValuePair<string, double>(item.Description,item.Time));
+          
+                ((ColumnSeries)mcChart.Series[i]).ItemsSource = 
+                    new KeyValuePair<string, double>[] { new KeyValuePair<string, double>(projects[i].ProjectName, projects[i].GetTimeSum()) };
+                ((ColumnSeries)mcChart.Series[i]).Title = projects[i].ProjectName;
             }
 
-            ((BarSeries)mcChart.Series[0]).ItemsSource = keyValuePairs;
-            mcChart.Title = projectChart.ProjectName;
+
 
 
         }
@@ -135,6 +128,20 @@ namespace Toggl_API
         //helper.AddTimeEntries(helper.Projects[1], "Web-Services Configuration", 3600 * 5, "Adding WebServices 0.1");
         //helper.AddTimeEntries(helper.Projects[1], "System Configuration", 3600 * 3, "System Configuration 0.1");
         //helper.AddTimeEntries(helper.Projects[1], "Testing", 3600 * 2, "Testing 0.1");
+
+
+
+
+        //var reports = new Toggl.Services.ReportService(Helper.APIToken);
+
+
+        //var standardParams = new DetailedReportParams()
+        //{
+        //    UserAgent = "TogglAPI.Net",
+        //    WorkspaceId = (int)helper.WorkSpaceID
+        //};
+
+        //var z = reports.Detailed(standardParams);
 
 
     }

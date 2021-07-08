@@ -12,6 +12,7 @@ namespace Toggl_API.APIHelper.ChartClasses
 
         public  List<TimePerTask> TimePerTasks{ get; set; }
 
+        
 
         public ProjectChart(string projectName,List<TimePerTask> timepertasks)
         {
@@ -37,6 +38,22 @@ namespace Toggl_API.APIHelper.ChartClasses
         {
             TimePerTasks.Add(new TimePerTask(description, time));
 
+        }
+
+        public double GetTimeSum()
+        {
+            if (TimePerTasks.Count==0)
+            {
+                throw new ArgumentNullException();
+            }
+
+            double sum = 0;
+            foreach (var item in TimePerTasks)
+            {
+                sum += item.Time;
+            }
+
+            return sum;
         }
 
     }
