@@ -153,6 +153,35 @@ namespace Toggl_API.APIHelper
 
         }
 
+        public ProjectChart GetProjectChart(Toggl.Project project,DateTime? startdate, DateTime? enddate)
+        {
+
+
+            var prams = new TimeEntryParams();
+
+            prams.StartDate = startdate;
+            prams.EndDate = enddate;
+
+            var hours = TimeEntryService.List(prams);
+
+            var choosedtimestamp = hours.Where(w => w.ProjectId == project.Id).ToList();
+
+            var projectChart = new ProjectChart(project.Name);
+
+
+
+            foreach (var item in choosedtimestamp)
+            {
+                projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours);
+            }
+
+
+
+
+            return projectChart;
+
+        }
+
         private string GetTaskNameByID(int Id, List<Toggl.Task> tasks)
         {
             var task = tasks.Where(w => w.Id == Id).ToList();

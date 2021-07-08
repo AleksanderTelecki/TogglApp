@@ -42,11 +42,6 @@ namespace Toggl_API.APIHelper.ChartClasses
 
         public double GetTimeSum()
         {
-            if (TimePerTasks.Count==0)
-            {
-                throw new ArgumentNullException();
-            }
-
             double sum = 0;
             foreach (var item in TimePerTasks)
             {

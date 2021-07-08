@@ -9,11 +9,30 @@
         Title="MainWindow" Height="450" Width="600">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.0*"/>
+            <RowDefinition Height="0.15*"/>
+            <RowDefinition Height="0.015*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
-        <DVC:Chart  Cursor="Cross" Title="Projects"  Grid.Row="1" Name="mcChart"
+        <Border Background="LightGray">
+            <StackPanel Orientation="Horizontal" Margin="6">
+                <StackPanel Orientation="Vertical" Margin="0 0 20 0">
+                    <TextBlock Text="StartDate"/>
+                    <DatePicker SelectedDateChanged="DatePick_Start_SelectedDateChanged" Name="DatePick_Start"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="EndDate"/>
+                    <DatePicker SelectedDateChanged="DatePick_End_SelectedDateChanged" Name="DatePick_End"/>
+                </StackPanel>
+            </StackPanel>
+            
+
+
+        </Border>
+        
+        <GridSplitter Grid.Row="1" BorderThickness="10" HorizontalAlignment="Stretch" BorderBrush="Gray" />
+
+        <DVC:Chart  Cursor="Cross" Title="Projects"  Grid.Row="2" Name="mcChart"
            Background="LightGray">
             <DVC:Chart.Series>
                 <DVC:ColumnSeries IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">

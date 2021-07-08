@@ -28,19 +28,21 @@ namespace Toggl_API
     /// </summary>
     public partial class MainWindow : Window
     {
-        
+        Helper helper;
         public MainWindow()
         {
 
             InitializeComponent();
+            helper = new Helper();
 
-         
+            DatePick_Start.SelectedDate = DateTime.Now.AddDays(-1);
+            DatePick_End.SelectedDate = DateTime.Now;
 
-            var helper = new Helper();
-            Trace.WriteLine(helper.GetClientProjectTimeTrack("Klient 1", "07/05/2021", "07/08/2021"));
-            Trace.WriteLine("");
-            Trace.WriteLine(helper.GetTotalProjectWorkTime(helper.Projects[0], "07/05/2021", "07/08/2021"));
-            LoadBarChartData(helper.GetProjectChart(helper.Projects[0]), helper.GetProjectChart(helper.Projects[1]));
+            
+            //Trace.WriteLine(helper.GetClientProjectTimeTrack("Klient 1", "07/05/2021", "07/08/2021"));
+            //Trace.WriteLine("");
+            //Trace.WriteLine(helper.GetTotalProjectWorkTime(helper.Projects[0], "07/05/2021", "07/08/2021"));
+            //LoadBarChartData(helper.GetProjectChart(helper.Projects[0]), helper.GetProjectChart(helper.Projects[1]));
 
 
         }
@@ -61,6 +63,24 @@ namespace Toggl_API
 
 
 
+        }
+
+        private void DatePick_Start_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DatePick_End.SelectedDate!=null&& DatePick_Start.SelectedDate != null)
+            {
+                LoadBarChartData(helper.GetProjectChart(helper.Projects[0], DatePick_Start.SelectedDate, DatePick_End.SelectedDate), helper.GetProjectChart(helper.Projects[1], DatePick_Start.SelectedDate, DatePick_End.SelectedDate));
+
+            }
+        }
+
+        private void DatePick_End_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DatePick_End.SelectedDate != null && DatePick_Start.SelectedDate != null)
+            {
+                LoadBarChartData(helper.GetProjectChart(helper.Projects[0], DatePick_Start.SelectedDate, DatePick_End.SelectedDate), helper.GetProjectChart(helper.Projects[1], DatePick_Start.SelectedDate, DatePick_End.SelectedDate));
+
+            }
         }
 
 
