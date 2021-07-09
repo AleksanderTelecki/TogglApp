@@ -119,8 +119,7 @@ namespace Toggl_API
                     }
 
                 }
-                var z = ArrayList.Distinct();
-                var csv = CsvWriter.WriteToText(columnNames, z.ToArray(), ';');
+                var csv = CsvWriter.WriteToText(columnNames, ArrayList.ToArray(), ';');
                 File.WriteAllText(saveFileDialog.FileName, csv);
 
             }
