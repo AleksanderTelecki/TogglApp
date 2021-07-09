@@ -152,7 +152,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="APIHelper\ChartClasses\ProjectChart.cs" />
+    <Compile Include="APIHelper\ClassModel\ProjectChart.cs" />
     <Compile Include="APIHelper\Helper.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>

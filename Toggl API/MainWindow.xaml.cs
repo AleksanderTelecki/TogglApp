@@ -23,7 +23,7 @@ using Toggl.Extensions;
 using Toggl.QueryObjects;
 using Toggl_API;
 using Toggl_API.APIHelper;
-using Toggl_API.APIHelper.ChartClasses;
+using Toggl_API.APIHelper.ClassModel;
 
 namespace Toggl_API
 {
@@ -46,7 +46,8 @@ namespace Toggl_API
 
             LoadBarChartData(helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate));
 
-            
+
+           
 
 
 
@@ -104,13 +105,22 @@ namespace Toggl_API
             {
 
                 var columnNames = new[] {"Date","ProjectName", "HoursSum","Task" };
-                var projectCharts = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
-                string[][] rows = new string[projectCharts.Count][];
-                for (int i = 0; i < projectCharts.Count; i++)
+                var projectCharts = helper.GetProjectChart(helper.Projects[0].UpdatedOn, DateTime.Now.AddDays(1));
+                List<string[]> ArrayList = new List<string[]>();
+                foreach (var projectchart in projectCharts)
                 {
-                    rows[i] = new[] {$"{((DateTime)DatePick_Start.SelectedDate).ToShortDateString()} - {((DateTime)DatePick_End.SelectedDate).ToShortDateString()}" ,projectCharts[i].ProjectName, projectCharts[i].TimeSum.ToString(),projectCharts[i].TasksToCsv()};
+                    var dateDistinc = projectchart.GetDistinctDate();
+                    foreach (var dateTime in dateDistinc)
+                    {
+
+                        var project = projectchart.GetProjectByDate(dateTime);
+                        ArrayList.Add(new[] { $"{dateTime.ToShortDateString()}", project.ProjectName, project.TimeSum.ToString(), project.TasksToCsv() });
+
+                    }
+
                 }
-                var csv = CsvWriter.WriteToText(columnNames, rows, ';');
+                var z = ArrayList.Distinct();
+                var csv = CsvWriter.WriteToText(columnNames, z.ToArray(), ';');
                 File.WriteAllText(saveFileDialog.FileName, csv);
 
             }
@@ -122,7 +132,31 @@ namespace Toggl_API
 
         }
 
-       
+        private void ExportChartCVS_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "CSV file (*.csv)|*.csv| All Files (*.*)|*.*";
+            saveFileDialog.FileName = "Report";
+            saveFileDialog.DefaultExt = ".csv";
+
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+
+                var columnNames = new[] { "Date", "ProjectName", "HoursSum", "Task" };
+                var projectCharts = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+                string[][] rows = new string[projectCharts.Count][];
+                for (int i = 0; i < projectCharts.Count; i++)
+                {
+                    rows[i] = new[] { $"{((DateTime)DatePick_Start.SelectedDate).ToShortDateString()} - {((DateTime)DatePick_End.SelectedDate).ToShortDateString()}", projectCharts[i].ProjectName, projectCharts[i].TimeSum.ToString(), projectCharts[i].TasksToCsv() };
+                }
+                var csv = CsvWriter.WriteToText(columnNames, rows, ';');
+                File.WriteAllText(saveFileDialog.FileName, csv);
+
+            }
+        }
+
+
 
 
 

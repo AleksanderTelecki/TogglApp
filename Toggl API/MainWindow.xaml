@@ -10,7 +10,8 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
-                <MenuItem Header="Export to CSV" Name="ExportCVS_MenuItem" Click="ExportCVS_MenuItem_Click"/>
+                <MenuItem Header="Export Full Report to CSV" Name="ExportCVS_MenuItem" Click="ExportCVS_MenuItem_Click"/>
+                <MenuItem Header="Export Chart Report to CSV" Name="ExportChartCVS_MenuItem" Click="ExportChartCVS_MenuItem_Click" />
             </MenuItem>
         </Menu>
         <Grid DockPanel.Dock="Bottom">

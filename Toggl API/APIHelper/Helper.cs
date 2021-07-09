@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Toggl;
 using Toggl.Extensions;
 using Toggl.QueryObjects;
-using Toggl_API.APIHelper.ChartClasses;
+using Toggl_API.APIHelper.ClassModel;
 
 namespace Toggl_API.APIHelper
 {
@@ -143,7 +143,7 @@ namespace Toggl_API.APIHelper
 
             foreach (var item in choosedtimestamp)
             {
-                projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours);
+                projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours,Convert.ToDateTime(item.Stop));
             }
 
 
@@ -172,7 +172,7 @@ namespace Toggl_API.APIHelper
 
             foreach (var item in choosedtimestamp)
             {
-                projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours);
+                projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours, Convert.ToDateTime(item.Stop));
             }
 
 
@@ -206,7 +206,7 @@ namespace Toggl_API.APIHelper
 
                 foreach (var item in choosedtimestamp)
                 {
-                    projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours);
+                    projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours, Convert.ToDateTime(item.Stop));
                 }
 
                 projectCharts.Add(projectChart);

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Toggl_API.APIHelper.ChartClasses
+namespace Toggl_API.APIHelper.ClassModel
 {
     public class ProjectChart
     {
@@ -34,9 +34,9 @@ namespace Toggl_API.APIHelper.ChartClasses
             TimePerTasks = new List<TimePerTask>();
         }
 
-        public void AddTask(string description,double time)
+        public void AddTask(string description,double time,DateTime date)
         {
-            TimePerTasks.Add(new TimePerTask(description, time));
+            TimePerTasks.Add(new TimePerTask(description, time, date));
 
         }
 
@@ -66,6 +66,29 @@ namespace Toggl_API.APIHelper.ChartClasses
 
         }
 
+        public List<DateTime> GetDistinctDate()
+        {
+
+            var dateDistinct = TimePerTasks.Select(o => o.ShortDateString).Distinct().ToList();
+            List<DateTime> dateTimes = new List<DateTime>();
+            foreach (var item in dateDistinct)
+            {
+                dateTimes.Add(Convert.ToDateTime(item));
+            }
+
+            return dateTimes;
+
+        }
+
+        public ProjectChart GetProjectByDate(DateTime dateTime)
+        {
+            ProjectChart projectChart = new ProjectChart(ProjectName);
+            projectChart.TimePerTasks = this.TimePerTasks.Where(w => w.ShortDateString == dateTime.ToShortDateString()).ToList();
+
+            return projectChart;
+
+        }
+
     }
 
     public class TimePerTask
@@ -74,10 +97,16 @@ namespace Toggl_API.APIHelper.ChartClasses
 
         public double Time { get; set; }
 
-        public TimePerTask(string description,double time)
+        public DateTime Date { get; set; }
+
+        public string ShortDateString { get => Date.ToShortDateString(); }
+
+
+        public TimePerTask(string description,double time, DateTime date)
         {
             Description = description;
             Time = time;
+            Date = date;
         }
 
         public override string ToString()
