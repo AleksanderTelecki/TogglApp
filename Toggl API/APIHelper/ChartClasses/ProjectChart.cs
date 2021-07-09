@@ -12,7 +12,7 @@ namespace Toggl_API.APIHelper.ChartClasses
 
         public  List<TimePerTask> TimePerTasks{ get; set; }
 
-        
+        public double TimeSum { get => GetTimeSum(); }
 
         public ProjectChart(string projectName,List<TimePerTask> timepertasks)
         {
@@ -40,7 +40,7 @@ namespace Toggl_API.APIHelper.ChartClasses
 
         }
 
-        public double GetTimeSum()
+        private double GetTimeSum()
         {
             double sum = 0;
             foreach (var item in TimePerTasks)
@@ -49,6 +49,21 @@ namespace Toggl_API.APIHelper.ChartClasses
             }
 
             return sum;
+        }
+
+        public string TasksToCsv()
+        {
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in TimePerTasks)
+            {
+                sb.Append($"({item.Time} h)-{item.Description}, ");
+
+
+            }
+
+            return sb.ToString();
+
         }
 
     }
@@ -63,6 +78,11 @@ namespace Toggl_API.APIHelper.ChartClasses
         {
             Description = description;
             Time = time;
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
         }
 
 

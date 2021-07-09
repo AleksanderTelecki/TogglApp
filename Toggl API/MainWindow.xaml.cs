@@ -1,6 +1,10 @@
-﻿using System;
+﻿using Csv;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,10 +39,18 @@ namespace Toggl_API
             InitializeComponent();
             helper = new Helper();
 
-            DatePick_Start.SelectedDate = DateTime.Now.AddDays(-1);
-            DatePick_End.SelectedDate = DateTime.Now;
+            DatePick_Start.SelectedDate = DateTime.Now;
+            DatePick_End.SelectedDate = DateTime.Now.AddDays(1);
+            DatePick_Start.SelectedDateChanged += DatePick_Start_SelectedDateChanged;
+            DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
+
+            LoadBarChartData(helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate));
 
             
+
+
+
+
             //Trace.WriteLine(helper.GetClientProjectTimeTrack("Klient 1", "07/05/2021", "07/08/2021"));
             //Trace.WriteLine("");
             //Trace.WriteLine(helper.GetTotalProjectWorkTime(helper.Projects[0], "07/05/2021", "07/08/2021"));
@@ -48,29 +60,26 @@ namespace Toggl_API
         }
 
 
-        private void LoadBarChartData(params ProjectChart[] projects)
-        {
 
-            List<KeyValuePair<string, double>> keyValuePairs = new List<KeyValuePair<string, double>>();
-            for (int i = 0; i < projects.Length; i++)
+        private void LoadBarChartData(List<ProjectChart> projects)
+        {           
+            mcChart.Series.Clear();
+            foreach(var project in projects)
             {
-          
-                ((ColumnSeries)mcChart.Series[i]).ItemsSource = 
-                    new KeyValuePair<string, double>[] { new KeyValuePair<string, double>(projects[i].ProjectName, projects[i].GetTimeSum()) };
-                ((ColumnSeries)mcChart.Series[i]).Title = projects[i].ProjectName;
+                ColumnSeries columnSeries = new ColumnSeries();
+                columnSeries.IndependentValueBinding = new Binding("Key");
+                columnSeries.DependentValueBinding = new Binding("Value");
+                columnSeries.Title = project.ProjectName;
+                columnSeries.ItemsSource = new KeyValuePair<string, double>[] { new KeyValuePair<string, double>(project.ProjectName, project.TimeSum) };
+                mcChart.Series.Add(columnSeries);
             }
-
-
-
-
         }
 
         private void DatePick_Start_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DatePick_End.SelectedDate!=null&& DatePick_Start.SelectedDate != null)
             {
-                LoadBarChartData(helper.GetProjectChart(helper.Projects[0], DatePick_Start.SelectedDate, DatePick_End.SelectedDate), helper.GetProjectChart(helper.Projects[1], DatePick_Start.SelectedDate, DatePick_End.SelectedDate));
-
+                LoadBarChartData(helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate));
             }
         }
 
@@ -78,11 +87,42 @@ namespace Toggl_API
         {
             if (DatePick_End.SelectedDate != null && DatePick_Start.SelectedDate != null)
             {
-                LoadBarChartData(helper.GetProjectChart(helper.Projects[0], DatePick_Start.SelectedDate, DatePick_End.SelectedDate), helper.GetProjectChart(helper.Projects[1], DatePick_Start.SelectedDate, DatePick_End.SelectedDate));
-
+                LoadBarChartData(helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate));
             }
         }
 
+        private void ExportCVS_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "CSV file (*.csv)|*.csv| All Files (*.*)|*.*";
+            saveFileDialog.FileName = "Report";
+            saveFileDialog.DefaultExt = ".csv"; 
+
+
+            if (saveFileDialog.ShowDialog()==true)
+            {
+
+                var columnNames = new[] {"Date","ProjectName", "HoursSum","Task" };
+                var projectCharts = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+                string[][] rows = new string[projectCharts.Count][];
+                for (int i = 0; i < projectCharts.Count; i++)
+                {
+                    rows[i] = new[] {$"{((DateTime)DatePick_Start.SelectedDate).ToShortDateString()} - {((DateTime)DatePick_End.SelectedDate).ToShortDateString()}" ,projectCharts[i].ProjectName, projectCharts[i].TimeSum.ToString(),projectCharts[i].TasksToCsv()};
+                }
+                var csv = CsvWriter.WriteToText(columnNames, rows, ';');
+                File.WriteAllText(saveFileDialog.FileName, csv);
+
+            }
+
+
+
+
+
+
+        }
+
+       
 
 
 
@@ -149,6 +189,23 @@ namespace Toggl_API
         //helper.AddTimeEntries(helper.Projects[1], "System Configuration", 3600 * 3, "System Configuration 0.1");
         //helper.AddTimeEntries(helper.Projects[1], "Testing", 3600 * 2, "Testing 0.1");
 
+        //helper.AddTimeEntries(helper.Projects[0], "Requirements Specification", 3600 * 1, "Requirements Analyse");
+        //helper.AddTimeEntries(helper.Projects[0], "Project Planning", 3600 * 2, "Gant Diagram 0.2");
+        //helper.AddTimeEntries(helper.Projects[0], "System Creation", 3600 * 4, "System Main Class Diagram");
+        //helper.AddTimeEntries(helper.Projects[0], "DataBase Creation", 3600 * 5, "DB projecting");
+        //helper.AddTimeEntries(helper.Projects[0], "BugFixing", 3600 * 1, "System Check 0.2");
+        //helper.AddTimeEntries(helper.Projects[0], "Testing", 3600 * 1, "Testing 0.2");
+
+
+
+        //helper.AddTimeEntries(helper.Projects[1], "Requirements Specification", 3600 * 2, "Client Meeting 0.2");
+        //helper.AddTimeEntries(helper.Projects[1], "Project Planning", 3600 * 3, "Team managment 0.1");
+        //helper.AddTimeEntries(helper.Projects[1], "System Designing", 3600 * 1, "Designer UI Template 0.2");
+        //helper.AddTimeEntries(helper.Projects[1], "Server Creation", 3600 * 2, "Server Configuration 0.1");
+        //helper.AddTimeEntries(helper.Projects[1], "Web-Services Configuration", 3600 * 1, "WebServices Configuration 0.1");
+        //helper.AddTimeEntries(helper.Projects[1], "System Configuration", 3600 * 3, "System Configuration 0.2");
+        //helper.AddTimeEntries(helper.Projects[1], "Testing", 3600 * 2, "Testing 0.2");
+
 
 
 
@@ -162,6 +219,14 @@ namespace Toggl_API
         //};
 
         //var z = reports.Detailed(standardParams);
+
+
+        //<DVC:Chart.Series>
+        //          <DVC:ColumnSeries IndependentValueBinding = "{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">
+        //          </DVC:ColumnSeries>
+        //          <DVC:ColumnSeries IndependentValueBinding = "{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">
+        //          </DVC:ColumnSeries>
+        //      </DVC:Chart.Series>
 
 
     }
