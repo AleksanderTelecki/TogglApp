@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -24,6 +25,7 @@ using Toggl.QueryObjects;
 using Toggl_API;
 using Toggl_API.APIHelper;
 using Toggl_API.APIHelper.ClassModel;
+using Toggl_API.UserWindows.EditChart;
 
 namespace Toggl_API
 {
@@ -32,22 +34,27 @@ namespace Toggl_API
     /// </summary>
     public partial class MainWindow : Window
     {
-        Helper helper;
+        public static Helper helper;
+        public static ObservableCollection<ProjectChart> MainWindowProjects;
+        public EditChart editChart;
+
         public MainWindow()
         {
 
             InitializeComponent();
             helper = new Helper();
+            MainWindowProjects = new ObservableCollection<ProjectChart>();
 
             DatePick_Start.SelectedDate = DateTime.Now;
             DatePick_End.SelectedDate = DateTime.Now.AddDays(1);
             DatePick_Start.SelectedDateChanged += DatePick_Start_SelectedDateChanged;
             DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
 
-            LoadBarChartData(helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate));
+            var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+            LoadBarChartData(projects);
+            MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
 
 
-           
 
 
 
@@ -60,12 +67,16 @@ namespace Toggl_API
 
         }
 
-
+        public void RefreshChart(List<ProjectChart> projectCharts)
+        {
+            LoadBarChartData(projectCharts);
+        }
+      
 
         private void LoadBarChartData(List<ProjectChart> projects)
         {           
             mcChart.Series.Clear();
-            foreach(var project in projects)
+            foreach (var project in projects)
             {
                 ColumnSeries columnSeries = new ColumnSeries();
                 columnSeries.IndependentValueBinding = new Binding("Key");
@@ -80,7 +91,13 @@ namespace Toggl_API
         {
             if (DatePick_End.SelectedDate!=null&& DatePick_Start.SelectedDate != null)
             {
-                LoadBarChartData(helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate));
+                var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+                MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
+                if (editChart!=null)
+                {
+                    editChart.Refresh();
+                }
+                LoadBarChartData(projects);
             }
         }
 
@@ -88,7 +105,13 @@ namespace Toggl_API
         {
             if (DatePick_End.SelectedDate != null && DatePick_Start.SelectedDate != null)
             {
-                LoadBarChartData(helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate));
+                var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+                MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
+                if (editChart != null)
+                {
+                    editChart.Refresh();
+                }
+                LoadBarChartData(projects);
             }
         }
 
@@ -153,6 +176,13 @@ namespace Toggl_API
                 File.WriteAllText(saveFileDialog.FileName, csv);
 
             }
+        }
+
+        private void Edit_Chart_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            editChart = new EditChart();
+            editChart.Owner = this;
+            editChart.Show();
         }
 
 

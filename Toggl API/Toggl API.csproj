@@ -148,6 +148,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UserWindows\EditChart\EditChart.xaml.cs">
+      <DependentUpon>EditChart.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\EditChart\CheckBoxModel.cs" />
+    <Compile Include="ViewModel\EditChart\ClientsCheckBox.cs" />
+    <Compile Include="ViewModel\EditChart\EditChartViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -162,6 +168,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UserWindows\EditChart\EditChart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -202,5 +212,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

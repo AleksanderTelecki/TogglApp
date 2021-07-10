@@ -14,6 +14,8 @@ namespace Toggl_API.APIHelper.ClassModel
 
         public double TimeSum { get => GetTimeSum(); }
 
+        public int ClientID { get; set; }
+
         public ProjectChart(string projectName,List<TimePerTask> timepertasks)
         {
             ProjectName = projectName;

@@ -1,0 +1,35 @@
+﻿<Window x:Class="Toggl_API.UserWindows.EditChart.EditChart"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Toggl_API.UserWindows.EditChart"
+        mc:Ignorable="d"
+     Title="EditChart" Height="350" Width="350">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+
+        </Grid.ColumnDefinitions>
+        <ListBox Name="ProjectList" ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Unchecked="CheckBox_Unchecked" Checked="CheckBox_Checked" Content="{Binding Project.ProjectName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <ListBox Name="ClientList" ItemsSource="{Binding Clients}" SelectedItem="{Binding SelectedClient}" Grid.Column="1">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Checked="CheckBox_Checked_Client" Unchecked="CheckBox_Unchecked_Client"  Content="{Binding Client.Name,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+
+
+
+    </Grid>
+</Window>

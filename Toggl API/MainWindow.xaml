@@ -13,6 +13,9 @@
                 <MenuItem Header="Export Full Report to CSV" Name="ExportCVS_MenuItem" Click="ExportCVS_MenuItem_Click"/>
                 <MenuItem Header="Export Chart Report to CSV" Name="ExportChartCVS_MenuItem" Click="ExportChartCVS_MenuItem_Click" />
             </MenuItem>
+            <MenuItem Header="Edit">
+                <MenuItem Header="Edit Chart" Name="Edit_Chart_MenuItem" Click="Edit_Chart_MenuItem_Click"/>
+            </MenuItem>
         </Menu>
         <Grid DockPanel.Dock="Bottom">
             <Grid.RowDefinitions>

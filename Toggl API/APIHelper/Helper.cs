@@ -28,6 +28,8 @@ namespace Toggl_API.APIHelper
 
         public List<Toggl.Project> Projects { get => ProjectService.List(); }
 
+        public List<Toggl.Client> Clients { get => ClientService.List(); }
+
 
 
 
@@ -40,8 +42,6 @@ namespace Toggl_API.APIHelper
             ClientService = new Toggl.Services.ClientService(APIToken);
             WorkspaceService = new Toggl.Services.WorkspaceService(APIToken);
             WorkSpaceID = WorkspaceService.List()[0].Id;
-
-
 
         }
 
@@ -138,7 +138,7 @@ namespace Toggl_API.APIHelper
             var choosedtimestamp = hours.Where(w => w.ProjectId == project.Id).ToList();
 
             var projectChart = new ProjectChart(project.Name);
-          
+            projectChart.ClientID = (int)project.ClientId;
 
 
             foreach (var item in choosedtimestamp)
@@ -167,7 +167,7 @@ namespace Toggl_API.APIHelper
             var choosedtimestamp = hours.Where(w => w.ProjectId == project.Id).ToList();
 
             var projectChart = new ProjectChart(project.Name);
-
+            projectChart.ClientID = (int)project.ClientId;
 
 
             foreach (var item in choosedtimestamp)
@@ -202,6 +202,7 @@ namespace Toggl_API.APIHelper
 
                 var projectChart = new ProjectChart(project.Name);
 
+                projectChart.ClientID = (int)project.ClientId;
 
 
                 foreach (var item in choosedtimestamp)
