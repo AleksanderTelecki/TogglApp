@@ -23,7 +23,7 @@ namespace Toggl_API.UserWindows.EditChart
     public partial class EditChart : Window
     {
         EditChartViewModel editChartViewModel;
-        List<ProjectChart> localProjects;
+        public static List<ProjectChart> localProjects;
         public EditChart()
         {
             InitializeComponent();

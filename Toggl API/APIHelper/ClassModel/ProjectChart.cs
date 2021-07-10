@@ -107,7 +107,7 @@ namespace Toggl_API.APIHelper.ClassModel
         public TimePerTask(string description,double time, DateTime date)
         {
             Description = description;
-            Time = time;
+            Time =Math.Round(time * 4, MidpointRounding.ToEven) / 4; ;
             Date = date;
         }
 

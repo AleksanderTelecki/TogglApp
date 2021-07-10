@@ -54,10 +54,7 @@ namespace Toggl_API
             LoadBarChartData(projects);
             MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
 
-
-
-
-
+            // TODO: EditWindow Synchronization with uncheked checkboxes when close the window
 
             //Trace.WriteLine(helper.GetClientProjectTimeTrack("Klient 1", "07/05/2021", "07/08/2021"));
             //Trace.WriteLine("");
@@ -129,6 +126,11 @@ namespace Toggl_API
 
                 var columnNames = new[] {"Date","ProjectName", "HoursSum","Task" };
                 var projectCharts = helper.GetProjectChart(helper.Projects[0].UpdatedOn, DateTime.Now.AddDays(1));
+                if (projectCharts.Count == 0)
+                {
+                    MessageBox.Show("Empty Chart!");
+                    return;
+                }
                 List<string[]> ArrayList = new List<string[]>();
                 foreach (var projectchart in projectCharts)
                 {
@@ -162,11 +164,28 @@ namespace Toggl_API
             saveFileDialog.DefaultExt = ".csv";
 
 
+
             if (saveFileDialog.ShowDialog() == true)
             {
 
                 var columnNames = new[] { "Date", "ProjectName", "HoursSum", "Task" };
-                var projectCharts = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+
+                List<ProjectChart> projectCharts = new List<ProjectChart>();
+                if (editChart!=null)
+                {
+                    projectCharts = EditChart.localProjects;
+                }
+                else
+                {
+                    projectCharts= helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+                }
+
+                if (projectCharts.Count==0)
+                {
+                    MessageBox.Show("Empty Chart!");
+                    return;
+                }
+
                 string[][] rows = new string[projectCharts.Count][];
                 for (int i = 0; i < projectCharts.Count; i++)
                 {
