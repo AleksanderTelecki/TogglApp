@@ -210,7 +210,12 @@ namespace Toggl_API.APIHelper
                     projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours, Convert.ToDateTime(item.Stop));
                 }
 
-                projectCharts.Add(projectChart);
+
+                if (projectChart.TimePerTasks.Count != 0)
+                {
+                    projectCharts.Add(projectChart);
+                }
+
             }
 
 
