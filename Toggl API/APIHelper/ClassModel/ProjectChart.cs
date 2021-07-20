@@ -50,7 +50,7 @@ namespace Toggl_API.APIHelper.ClassModel
                 sum += item.Time;
             }
 
-            return sum;
+            return Math.Round(sum * 4, MidpointRounding.ToEven) / 4;
         }
 
         public string TasksToCsv()
@@ -123,7 +123,7 @@ namespace Toggl_API.APIHelper.ClassModel
         public TimePerTask(string description,double time, DateTime date)
         {
             Description = description;
-            Time =Math.Round(time * 4, MidpointRounding.ToEven) / 4; ;
+            Time =time;
             Date = date;
         }
 
