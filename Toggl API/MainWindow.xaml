@@ -35,8 +35,8 @@
                         <DatePicker  Name="DatePick_End"/>
                     </StackPanel>
                     <StackPanel Margin="0 15 0 0" Orientation="Horizontal">
-                        <Button Click="Minus_Click" Height="20" Width="20" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5 0 0 0" Content="-"/>
-                        <Button Click="Plus_Click" Height="20" Width="20" Margin="5 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Center" Content="+"/>
+                        <Button x:Name="MisunDate" Click="Minus_Click" Height="20" Width="20" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5 0 0 0" Content="-"/>
+                        <Button x:Name="PlusDate" Click="Plus_Click" Height="20" Width="20" Margin="5 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Center" Content="+"/>
                     </StackPanel>
                 </StackPanel>
 

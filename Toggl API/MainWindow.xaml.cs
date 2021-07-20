@@ -235,8 +235,8 @@ namespace Toggl_API
 
         private void Minus_Click(object sender, RoutedEventArgs e)
         {
-            DatePick_End.SelectedDateChanged -= DatePick_End_SelectedDateChanged;
             DatePick_Start.SelectedDateChanged -= DatePick_Start_SelectedDateChanged;
+            DatePick_End.SelectedDateChanged -= DatePick_End_SelectedDateChanged;
 
             DatePick_Start.SelectedDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(-1);
             DatePick_End.SelectedDate = ((DateTime)DatePick_End.SelectedDate).AddDays(-1);
@@ -252,9 +252,9 @@ namespace Toggl_API
 
         private void Plus_Click(object sender, RoutedEventArgs e)
         {
-            DatePick_End.SelectedDateChanged -= DatePick_End_SelectedDateChanged;
             DatePick_Start.SelectedDateChanged -= DatePick_Start_SelectedDateChanged;
-
+            DatePick_End.SelectedDateChanged -= DatePick_End_SelectedDateChanged;
+           
             DatePick_End.SelectedDate = ((DateTime)DatePick_End.SelectedDate).AddDays(1);
             DatePick_Start.SelectedDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(1);
 
