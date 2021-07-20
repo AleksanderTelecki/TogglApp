@@ -140,7 +140,7 @@ namespace Toggl_API
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "CSV file (*.csv)|*.csv| All Files (*.*)|*.*";
-            saveFileDialog.FileName = "Report";
+            saveFileDialog.FileName = $"{((DateTime)helper.Projects.Min(w => w.UpdatedOn)).ToShortDateString()} - {DateTime.Now.AddDays(1).ToShortDateString()}";
             saveFileDialog.DefaultExt = ".csv"; 
 
 
@@ -186,7 +186,7 @@ namespace Toggl_API
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "CSV file (*.csv)|*.csv| All Files (*.*)|*.*";
-            saveFileDialog.FileName = "Report";
+            saveFileDialog.FileName = $"{((DateTime)DatePick_Start.SelectedDate).ToShortDateString()} - {((DateTime)DatePick_End.SelectedDate).ToShortDateString()}";
             saveFileDialog.DefaultExt = ".csv";
 
 
@@ -231,6 +231,39 @@ namespace Toggl_API
             editChart = new EditChart();
             editChart.Owner = this;
             editChart.Show();
+        }
+
+        private void Minus_Click(object sender, RoutedEventArgs e)
+        {
+            DatePick_End.SelectedDateChanged -= DatePick_End_SelectedDateChanged;
+            DatePick_Start.SelectedDateChanged -= DatePick_Start_SelectedDateChanged;
+
+            DatePick_Start.SelectedDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(-1);
+            DatePick_End.SelectedDate = ((DateTime)DatePick_End.SelectedDate).AddDays(-1);
+
+            var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+            LoadBarChartData(projects);
+            MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
+            DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
+            DatePick_Start.SelectedDateChanged += DatePick_Start_SelectedDateChanged;
+
+
+        }
+
+        private void Plus_Click(object sender, RoutedEventArgs e)
+        {
+            DatePick_End.SelectedDateChanged -= DatePick_End_SelectedDateChanged;
+            DatePick_Start.SelectedDateChanged -= DatePick_Start_SelectedDateChanged;
+
+            DatePick_End.SelectedDate = ((DateTime)DatePick_End.SelectedDate).AddDays(1);
+            DatePick_Start.SelectedDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(1);
+
+            var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+            LoadBarChartData(projects);
+            MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
+            DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
+            DatePick_Start.SelectedDateChanged += DatePick_Start_SelectedDateChanged;
+
         }
 
 
