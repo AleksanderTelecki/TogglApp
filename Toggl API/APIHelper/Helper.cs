@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,8 @@ namespace Toggl_API.APIHelper
 {
     public class Helper
     {
-        public static string APIToken { get => "c99e059b3a3bb073c14097be588d2cbd"; }
+
+        public static string APIToken { get => ConfigurationManager.AppSettings["APIkey"]; }
 
         public Toggl.Services.ProjectService ProjectService { get; private set; }
 
@@ -35,7 +37,6 @@ namespace Toggl_API.APIHelper
 
         public Helper()
         {
-
             ProjectService = new Toggl.Services.ProjectService(APIToken);
             TaskService = new Toggl.Services.TaskService(APIToken);
             TimeEntryService = new Toggl.Services.TimeEntryService(APIToken);
@@ -190,6 +191,48 @@ namespace Toggl_API.APIHelper
 
             prams.StartDate = startdate;
             prams.EndDate = enddate;
+
+            var hours = TimeEntryService.List(prams);
+
+            List<ProjectChart> projectCharts = new List<ProjectChart>();
+            foreach (var project in Projects)
+            {
+
+
+                var choosedtimestamp = hours.Where(w => w.ProjectId == project.Id).ToList();
+
+                var projectChart = new ProjectChart(project.Name);
+
+                projectChart.ClientID = (int)project.ClientId;
+
+
+                foreach (var item in choosedtimestamp)
+                {
+                    projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours, Convert.ToDateTime(item.Stop));
+                }
+
+
+                if (projectChart.TimePerTasks.Count!=0)
+                {
+                    projectCharts.Add(projectChart);
+                }
+
+            }
+
+
+
+            return projectCharts;
+
+        }
+
+        public List<ProjectChart> GetProjectChartFull()
+        {
+
+
+            var prams = new TimeEntryParams();
+
+            prams.StartDate = Projects.Min(w => w.UpdatedOn);
+            prams.EndDate = DateTime.Now.AddDays(1);
 
             var hours = TimeEntryService.List(prams);
 

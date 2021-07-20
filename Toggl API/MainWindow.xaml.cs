@@ -37,6 +37,7 @@ namespace Toggl_API
         public static Helper helper;
         public static ObservableCollection<ProjectChart> MainWindowProjects;
         public EditChart editChart;
+        public (DateTime? Start, DateTime? End) oldDate;
 
         public MainWindow()
         {
@@ -47,6 +48,8 @@ namespace Toggl_API
 
             DatePick_Start.SelectedDate = DateTime.Now;
             DatePick_End.SelectedDate = DateTime.Now.AddDays(1);
+            oldDate.Start = DateTime.Now;
+            oldDate.End = DateTime.Now.AddDays(1);
             DatePick_Start.SelectedDateChanged += DatePick_Start_SelectedDateChanged;
             DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
 
@@ -86,6 +89,14 @@ namespace Toggl_API
 
         private void DatePick_Start_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
+
+            if (DatePick_Start.SelectedDate > DatePick_End.SelectedDate)
+            {
+                MessageBox.Show("StartDate can't be older then EndDate ", "Attention!", MessageBoxButton.OK);
+                DatePick_Start.SelectedDate = oldDate.Start;
+                return;
+            }
+
             if (DatePick_End.SelectedDate!=null&& DatePick_Start.SelectedDate != null)
             {
                 var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
@@ -95,11 +106,22 @@ namespace Toggl_API
                     editChart.Refresh();
                 }
                 LoadBarChartData(projects);
+
+                oldDate.Start = DatePick_Start.SelectedDate;
             }
         }
 
         private void DatePick_End_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
+            
+
+            if (DatePick_Start.SelectedDate>DatePick_End.SelectedDate)
+            {
+                MessageBox.Show("StartDate can't be older then EndDate ", "Attention!", MessageBoxButton.OK);
+                DatePick_End.SelectedDate = oldDate.End;
+                return;
+            }
+
             if (DatePick_End.SelectedDate != null && DatePick_Start.SelectedDate != null)
             {
                 var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
@@ -109,6 +131,7 @@ namespace Toggl_API
                     editChart.Refresh();
                 }
                 LoadBarChartData(projects);
+                oldDate.End = DatePick_End.SelectedDate;
             }
         }
 
@@ -124,8 +147,8 @@ namespace Toggl_API
             if (saveFileDialog.ShowDialog()==true)
             {
 
-                var columnNames = new[] {"Date","ProjectName", "HoursSum","Task" };
-                var projectCharts = helper.GetProjectChart(helper.Projects[0].UpdatedOn, DateTime.Now.AddDays(1));
+                var columnNames = new[] {"Date","ProjectName", "Hours","Tasks" };
+                var projectCharts = helper.GetProjectChartFull();
                 if (projectCharts.Count == 0)
                 {
                     MessageBox.Show("Empty Chart!");
@@ -145,7 +168,10 @@ namespace Toggl_API
 
                 }
                 var csv = CsvWriter.WriteToText(columnNames, ArrayList.ToArray(), ';');
-                File.WriteAllText(saveFileDialog.FileName, csv);
+                StringBuilder stringBuilder = new StringBuilder(csv);
+                stringBuilder.Insert(0, Environment.NewLine);
+                stringBuilder.Insert(0,$"Date Range: {((DateTime)helper.Projects.Min(w => w.UpdatedOn)).ToShortDateString()} - {DateTime.Now.AddDays(1).ToShortDateString()}");
+                File.WriteAllText(saveFileDialog.FileName, stringBuilder.ToString(),Encoding.UTF8);
 
             }
 
@@ -168,7 +194,7 @@ namespace Toggl_API
             if (saveFileDialog.ShowDialog() == true)
             {
 
-                var columnNames = new[] { "Date", "ProjectName", "HoursSum", "Task" };
+                var columnNames = new[] { "Date", "ProjectName", "Hours", "Tasks" };
 
                 List<ProjectChart> projectCharts = new List<ProjectChart>();
                 if (editChart!=null)
@@ -192,7 +218,10 @@ namespace Toggl_API
                     rows[i] = new[] { $"{((DateTime)DatePick_Start.SelectedDate).ToShortDateString()} - {((DateTime)DatePick_End.SelectedDate).ToShortDateString()}", projectCharts[i].ProjectName, projectCharts[i].TimeSum.ToString(), projectCharts[i].TasksToCsv() };
                 }
                 var csv = CsvWriter.WriteToText(columnNames, rows, ';');
-                File.WriteAllText(saveFileDialog.FileName, csv);
+                StringBuilder stringBuilder = new StringBuilder(csv);
+                stringBuilder.Insert(0, Environment.NewLine);
+                stringBuilder.Insert(0, $"Date Range: {((DateTime)DatePick_Start.SelectedDate).ToShortDateString()} - {((DateTime)DatePick_End.SelectedDate).ToShortDateString()}");
+                File.WriteAllText(saveFileDialog.FileName, stringBuilder.ToString(), Encoding.UTF8);
 
             }
         }

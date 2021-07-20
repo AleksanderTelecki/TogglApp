@@ -57,11 +57,27 @@ namespace Toggl_API.APIHelper.ClassModel
         {
 
             StringBuilder sb = new StringBuilder();
+            int taskswithoutnames = 0;
             foreach (var item in TimePerTasks)
             {
-                sb.Append($"({item.Time} h)-{item.Description}, ");
+               
+                if (String.IsNullOrEmpty(item.Description))
+                {
+                    taskswithoutnames++;
+                }
+                else
+                {
+                    sb.Append($"{item.Description}, ");
+                }
+               
+                
 
+            }
 
+            if (taskswithoutnames!=0)
+            {
+                
+                sb.Append($"{taskswithoutnames} - Task Without Description, ");
             }
 
             return sb.ToString();
