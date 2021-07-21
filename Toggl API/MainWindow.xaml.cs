@@ -70,6 +70,7 @@ namespace Toggl_API
 
         public void RefreshChart(List<ProjectChart> projectCharts)
         {
+
             LoadBarChartData(projectCharts);
         }
       
@@ -78,6 +79,8 @@ namespace Toggl_API
         {
 
             WpfPlot.Plot.Clear();
+            WpfPlot.Plot.Title("");
+            WpfPlot.Plot.XTicks(new string[] { });
 
             if (projects.Count==0)
             {
@@ -121,7 +124,7 @@ namespace Toggl_API
 
 
             WpfPlot.Plot.YLabel("Hours");
-            WpfPlot.Plot.Title($"Projects TimeSum:{timesums.Sum()}");
+            WpfPlot.Plot.Title($"Projects Total Hours:{timesums.Sum()}");
             WpfPlot.Plot.Legend(location: Alignment.UpperRight);
             WpfPlot.Plot.SetAxisLimits(yMin: 0);
 
