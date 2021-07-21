@@ -109,7 +109,7 @@ namespace Toggl_API
 
             WpfPlot.Plot.AddBar(initbarcount.ToArray(), initpositions.ToArray());
             WpfPlot.Plot.XTicks(initpositions.ToArray(), lables.ToArray());
-
+            WpfPlot.Plot.XAxis.TickLabelStyle(rotation: 30);
             
             for (int j = 0; j < initbarcount.ToArray().Length; j++)
             {
