@@ -1,9 +1,11 @@
 ﻿using Csv;
 using Microsoft.Win32;
+using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -11,11 +13,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.DataVisualization.Charting;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -26,6 +26,7 @@ using Toggl_API;
 using Toggl_API.APIHelper;
 using Toggl_API.APIHelper.ClassModel;
 using Toggl_API.UserWindows.EditChart;
+
 
 namespace Toggl_API
 {
@@ -74,17 +75,60 @@ namespace Toggl_API
       
 
         private void LoadBarChartData(List<ProjectChart> projects)
-        {           
-            mcChart.Series.Clear();
-            foreach (var project in projects)
+        {
+
+            WpfPlot.Plot.Clear();
+
+            if (projects.Count==0)
             {
-                ColumnSeries columnSeries = new ColumnSeries();
-                columnSeries.IndependentValueBinding = new Binding("Key");
-                columnSeries.DependentValueBinding = new Binding("Value");
-                columnSeries.Title = project.ProjectName;
-                columnSeries.ItemsSource = new KeyValuePair<string, double>[] { new KeyValuePair<string, double>(project.ProjectName, project.TimeSum) };
-                mcChart.Series.Add(columnSeries);
+                return;
             }
+
+            Random rnd = new Random();
+          
+            //initialize
+            List<double> initbarcount = new List<double>();
+            List<double> initpositions = new List<double>();
+            List<string> lables = new List<string>();
+            List<double> timesums = new List<double>();
+            int counter = 0;
+
+            foreach (var item in projects)
+            {
+                initbarcount.Add(0);
+                initpositions.Add(counter);
+                lables.Add(item.ProjectName);
+                timesums.Add(item.TimeSum);
+                counter++;
+
+            }
+
+
+            WpfPlot.Plot.AddBar(initbarcount.ToArray(), initpositions.ToArray());
+            WpfPlot.Plot.XTicks(initpositions.ToArray(), lables.ToArray());
+
+            
+            for (int j = 0; j < initbarcount.ToArray().Length; j++)
+            {
+
+                var bar = WpfPlot.Plot.AddBar(new double[] {timesums[j] }, new double[] { initpositions[j] });
+                bar.ShowValuesAboveBars = true;
+                bar.FillColor = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+                bar.Label = lables[j];
+
+
+            }
+
+
+            WpfPlot.Plot.YLabel("Hours");
+            WpfPlot.Plot.Title($"Projects TimeSum:{timesums.Sum()}");
+            WpfPlot.Plot.Legend(location: Alignment.UpperRight);
+            WpfPlot.Plot.SetAxisLimits(yMin: 0);
+
+
+
+
+
         }
 
         private void DatePick_Start_SelectedDateChanged(object sender, SelectionChangedEventArgs e)

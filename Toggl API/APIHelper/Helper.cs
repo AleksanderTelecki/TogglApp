@@ -144,7 +144,7 @@ namespace Toggl_API.APIHelper
 
             foreach (var item in choosedtimestamp)
             {
-                projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours,Convert.ToDateTime(item.Stop));
+                projectChart.AddTask(item.Description, TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours,Convert.ToDateTime(item.Stop));
             }
 
 
@@ -173,7 +173,7 @@ namespace Toggl_API.APIHelper
 
             foreach (var item in choosedtimestamp)
             {
-                projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours, Convert.ToDateTime(item.Stop));
+                projectChart.AddTask(item.Description, TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours, Convert.ToDateTime(item.Stop));
             }
 
 
@@ -208,7 +208,7 @@ namespace Toggl_API.APIHelper
 
                 foreach (var item in choosedtimestamp)
                 {
-                    projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours, Convert.ToDateTime(item.Stop));
+                    projectChart.AddTask(item.Description, TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours, Convert.ToDateTime(item.Stop));
                 }
 
 
@@ -250,7 +250,7 @@ namespace Toggl_API.APIHelper
 
                 foreach (var item in choosedtimestamp)
                 {
-                    projectChart.AddTask(item.Description, TimeSpan.FromSeconds((double)item.Duration).TotalHours, Convert.ToDateTime(item.Stop));
+                    projectChart.AddTask(item.Description, TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours, Convert.ToDateTime(item.Stop));
                 }
 
 

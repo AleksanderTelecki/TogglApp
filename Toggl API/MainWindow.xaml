@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Toggl_API"
-       xmlns:DVC="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=DotNetProjects.DataVisualization.Toolkit"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="600">
     <DockPanel>
@@ -46,9 +45,9 @@
 
             <GridSplitter Grid.Row="1" BorderThickness="10" HorizontalAlignment="Stretch" BorderBrush="Gray" />
 
-            <DVC:Chart  Cursor="Cross" Title="Projects"  Grid.Row="2" Name="mcChart" Background="LightGray">
 
-            </DVC:Chart>
+            <WpfPlot Grid.Row="2" Name="WpfPlot" />
+           
 
         </Grid>
     </DockPanel>
