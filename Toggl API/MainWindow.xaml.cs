@@ -47,6 +47,7 @@ namespace Toggl_API
             helper = new Helper();
             MainWindowProjects = new ObservableCollection<ProjectChart>();
 
+
             DatePick_Start.SelectedDate = DateTime.Now;
             DatePick_End.SelectedDate = DateTime.Now.AddDays(1);
             oldDate.Start = DateTime.Now;

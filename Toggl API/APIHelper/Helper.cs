@@ -144,6 +144,10 @@ namespace Toggl_API.APIHelper
 
             foreach (var item in choosedtimestamp)
             {
+                if (TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours<0)
+                {
+                    continue;
+                }
                 projectChart.AddTask(item.Description, TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours,Convert.ToDateTime(item.Stop));
             }
 
@@ -173,6 +177,10 @@ namespace Toggl_API.APIHelper
 
             foreach (var item in choosedtimestamp)
             {
+                if (TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours < 0)
+                {
+                    continue;
+                }
                 projectChart.AddTask(item.Description, TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours, Convert.ToDateTime(item.Stop));
             }
 
@@ -208,6 +216,10 @@ namespace Toggl_API.APIHelper
 
                 foreach (var item in choosedtimestamp)
                 {
+                    if (TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours < 0)
+                    {
+                        continue;
+                    }
                     projectChart.AddTask(item.Description, TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours, Convert.ToDateTime(item.Stop));
                 }
 
@@ -250,6 +262,10 @@ namespace Toggl_API.APIHelper
 
                 foreach (var item in choosedtimestamp)
                 {
+                    if (TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours < 0)
+                    {
+                        continue;
+                    }
                     projectChart.AddTask(item.Description, TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours, Convert.ToDateTime(item.Stop));
                 }
 
