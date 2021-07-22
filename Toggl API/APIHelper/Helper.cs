@@ -213,7 +213,7 @@ namespace Toggl_API.APIHelper
 
                 projectChart.ClientID = (int)project.ClientId;
 
-
+                
                 foreach (var item in choosedtimestamp)
                 {
                     if (TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours < 0)

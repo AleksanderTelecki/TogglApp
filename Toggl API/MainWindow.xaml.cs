@@ -67,6 +67,7 @@ namespace Toggl_API
             //LoadBarChartData(helper.GetProjectChart(helper.Projects[0]), helper.GetProjectChart(helper.Projects[1]));
 
 
+
         }
 
         public void RefreshChart(List<ProjectChart> projectCharts)
@@ -125,9 +126,9 @@ namespace Toggl_API
 
 
             WpfPlot.Plot.YLabel("Hours");
-            WpfPlot.Plot.Title($"Projects Total Hours:{timesums.Sum()}");
-            WpfPlot.Plot.Legend(location: Alignment.UpperRight);
+            WpfPlot.Plot.Title($"Total Hours: {timesums.Sum()}");
             WpfPlot.Plot.SetAxisLimits(yMin: 0);
+
 
 
 
@@ -283,28 +284,27 @@ namespace Toggl_API
 
         private void Minus_Click(object sender, RoutedEventArgs e)
         {
-            DatePick_Start.SelectedDateChanged -= DatePick_Start_SelectedDateChanged;
-            DatePick_End.SelectedDateChanged -= DatePick_End_SelectedDateChanged;
-
-            DatePick_Start.SelectedDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(-1);
-            DatePick_End.SelectedDate = ((DateTime)DatePick_End.SelectedDate).AddDays(-1);
-
-            var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
-            LoadBarChartData(projects);
-            MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
-            DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
-            DatePick_Start.SelectedDateChanged += DatePick_Start_SelectedDateChanged;
-
+            DateTime startDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(-1);
+            DateTime endDate = ((DateTime)DatePick_End.SelectedDate).AddDays(-1);
+            UpdateDateWithoutPickerTriggers(startDate, endDate);
 
         }
 
         private void Plus_Click(object sender, RoutedEventArgs e)
         {
+            DateTime startDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(1);
+            DateTime endDate = ((DateTime)DatePick_End.SelectedDate).AddDays(1);
+            UpdateDateWithoutPickerTriggers(startDate, endDate);
+           
+        }
+
+        private void UpdateDateWithoutPickerTriggers(DateTime startDate,DateTime endDate)
+        {
             DatePick_Start.SelectedDateChanged -= DatePick_Start_SelectedDateChanged;
             DatePick_End.SelectedDateChanged -= DatePick_End_SelectedDateChanged;
-           
-            DatePick_End.SelectedDate = ((DateTime)DatePick_End.SelectedDate).AddDays(1);
-            DatePick_Start.SelectedDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(1);
+
+            DatePick_End.SelectedDate = endDate;
+            DatePick_Start.SelectedDate = startDate;
 
             var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
             LoadBarChartData(projects);
@@ -312,14 +312,45 @@ namespace Toggl_API
             DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
             DatePick_Start.SelectedDateChanged += DatePick_Start_SelectedDateChanged;
 
+            oldDate.Start = startDate;
+            oldDate.End = endDate;
+
+        }
+
+        private void CurrMonth_Button_Click(object sender, RoutedEventArgs e)
+        {
+            DateTime now = DateTime.Now;
+            var startDate = new DateTime(now.Year, now.Month, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1);
+            UpdateDateWithoutPickerTriggers(startDate, endDate);
+
+        }
+
+    
+        private void CurrWeek_Button_Click(object sender, RoutedEventArgs e)
+        {
+            DateTime now = DateTime.Now;
+            var startDate = now.FirstDayOfWeek();
+            var endDate = now.LastDayOfWeek();
+            UpdateDateWithoutPickerTriggers(startDate, endDate);
+        }
+
+        private void CurrDay_Button_Click(object sender, RoutedEventArgs e)
+        {
+            var startDate = DateTime.Now;
+            var endDate = DateTime.Now.AddDays(1);
+            UpdateDateWithoutPickerTriggers(startDate, endDate);
+        }
+
+        private void Refresh_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+            UpdateDateWithoutPickerTriggers((DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
         }
 
 
 
 
-
-        // xmlns:DVC="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Compatible;assembly=DotNetProjects.DataVisualization.Toolkit"
-        // xmlns:DVC="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives;assembly=DotNetProjects.DataVisualization.Toolkit"
 
 
 
@@ -413,12 +444,6 @@ namespace Toggl_API
         //var z = reports.Detailed(standardParams);
 
 
-        //<DVC:Chart.Series>
-        //          <DVC:ColumnSeries IndependentValueBinding = "{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">
-        //          </DVC:ColumnSeries>
-        //          <DVC:ColumnSeries IndependentValueBinding = "{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">
-        //          </DVC:ColumnSeries>
-        //      </DVC:Chart.Series>
 
 
     }

@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Toggl_API"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="600">
+        Title="MainWindow" Height="450" Width="660">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
+                <MenuItem Header="Refresh" Name="Refresh_MenuItem" Click="Refresh_MenuItem_Click"/>
                 <MenuItem Header="Export Full Report to CSV" Name="ExportCVS_MenuItem" Click="ExportCVS_MenuItem_Click"/>
                 <MenuItem Header="Export Chart Report to CSV" Name="ExportChartCVS_MenuItem" Click="ExportChartCVS_MenuItem_Click" />
             </MenuItem>
@@ -25,7 +26,7 @@
 
             <Border Background="LightGray">
                 <StackPanel Orientation="Horizontal" Margin="6">
-                    <StackPanel Orientation="Vertical" Margin="0 0 20 0">
+                    <StackPanel Orientation="Vertical" Margin="0 0 10 0">
                         <TextBlock Text="StartDate"/>
                         <DatePicker Name="DatePick_Start"/>
                     </StackPanel>
@@ -33,11 +34,27 @@
                         <TextBlock Text="EndDate"/>
                         <DatePicker  Name="DatePick_End"/>
                     </StackPanel>
-                    <StackPanel Margin="0 15 0 0" Orientation="Horizontal">
-                        <Button x:Name="MisunDate" Click="Minus_Click" Height="20" Width="20" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5 0 0 0" Content="-"/>
-                        <Button x:Name="PlusDate" Click="Plus_Click" Height="20" Width="20" Margin="5 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Center" Content="+"/>
+
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="MisunDate" Click="Minus_Click" Height="22" Width="22" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5 0 0 0" Content="-"/>
+                            <Button x:Name="PlusDate" Click="Plus_Click" Height="22" Width="22" Margin="5 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Center" Content="+"/>
+                        </StackPanel>
                     </StackPanel>
+
+                    <StackPanel Margin="10 0 0 0" Orientation="Vertical" HorizontalAlignment="Left">
+                        <TextBlock/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="CurrMonth_Button" Click="CurrMonth_Button_Click" VerticalAlignment="Center" Margin="5 0 0 0" Width="95" Height="22" HorizontalAlignment="Center" Content="Current Month"/>
+                            <Button x:Name="CurrWeek_Button" Click="CurrWeek_Button_Click" VerticalAlignment="Center" Margin="5 0 0 0" Width="95"  Height="22" HorizontalAlignment="Center" Content="Current Week"/>
+                            <Button x:Name="CurrDay_Button" Click="CurrDay_Button_Click" VerticalAlignment="Center" Margin="5 0 0 0" Width="95"  Height="22" HorizontalAlignment="Center" Content="Current Day"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
                 </StackPanel>
+
+               
 
 
 
@@ -46,7 +63,7 @@
             <GridSplitter Grid.Row="1" BorderThickness="10" HorizontalAlignment="Stretch" BorderBrush="Gray" />
 
 
-            <WpfPlot Grid.Row="2" Name="WpfPlot" />
+            <WpfPlot  Grid.Row="2" Name="WpfPlot" />
            
 
         </Grid>

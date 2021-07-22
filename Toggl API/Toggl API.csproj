@@ -164,6 +164,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="APIHelper\DateTimeExtensions.cs" />
     <Compile Include="UserWindows\EditChart\EditChart.xaml.cs">
       <DependentUpon>EditChart.xaml</DependentUpon>
     </Compile>
