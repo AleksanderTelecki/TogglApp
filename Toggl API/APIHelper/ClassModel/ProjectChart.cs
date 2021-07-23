@@ -14,18 +14,22 @@ namespace Toggl_API.APIHelper.ClassModel
 
         public double TimeSum { get => GetTimeSum(); }
 
+        public int ProjectID { get; set; }
+
         public int ClientID { get; set; }
 
-        public ProjectChart(string projectName,List<TimePerTask> timepertasks)
+        public ProjectChart(string projectName,List<TimePerTask> timepertasks,int id)
         {
+            ProjectID = id;
             ProjectName = projectName;
             TimePerTasks = timepertasks;
             TimePerTasks = new List<TimePerTask>();
 
         }
 
-        public ProjectChart(string projectName)
+        public ProjectChart(string projectName,int id)
         {
+            ProjectID = id;
             ProjectName = projectName;
             TimePerTasks = new List<TimePerTask>();
 
@@ -100,7 +104,7 @@ namespace Toggl_API.APIHelper.ClassModel
 
         public ProjectChart GetProjectByDate(DateTime dateTime)
         {
-            ProjectChart projectChart = new ProjectChart(ProjectName);
+            ProjectChart projectChart = new ProjectChart(ProjectName, ProjectID);
             projectChart.TimePerTasks = this.TimePerTasks.Where(w => w.ShortDateString == dateTime.ToShortDateString()).ToList();
 
             return projectChart;

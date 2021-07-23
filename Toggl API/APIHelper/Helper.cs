@@ -1,6 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,7 +36,7 @@ namespace Toggl_API.APIHelper
 
         public List<Toggl.Client> Clients { get => ClientService.List(); }
 
-
+        public List<ProjectColor> projectColors { get; set; }
 
 
         public Helper()
@@ -43,6 +47,102 @@ namespace Toggl_API.APIHelper
             ClientService = new Toggl.Services.ClientService(APIToken);
             WorkspaceService = new Toggl.Services.WorkspaceService(APIToken);
             WorkSpaceID = WorkspaceService.List()[0].Id;
+            projectColors = new List<ProjectColor>();
+            InitializeColors();
+
+        }
+
+        private void InitializeColors()
+        {
+           
+            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "color.json");
+            if (File.Exists(filePath))
+            {
+                List<ProjectColor> descolors = JSONDeserialize<List<ProjectColor>>(filePath);
+                updateColors(descolors, filePath);
+            }
+            else
+            {
+                foreach (var item in Projects)
+                {
+                    projectColors.Add(new ProjectColor(item.Name, (int)item.Id));
+                }
+                JSONSerialize(projectColors, filePath);
+            }
+
+        }
+
+        public Color GetColor(int id)
+        {
+            return projectColors.First(w => w.ID == id).GetCurrentColor();
+        }
+
+        private void updateColors(List<ProjectColor> updColors,string filePath)
+        {
+
+            bool iscurrent = true;
+            foreach (var item in Projects)
+            {
+                if (!updColors.Exists(w => (w.ID == item.Id) && (w.Name == item.Name)))
+                {
+                    updColors.Add(new ProjectColor(item.Name, (int)item.Id));
+                    iscurrent = false;
+                }
+            }
+         
+            if (!iscurrent)
+            {
+                JSONSerialize(projectColors, filePath);
+            }
+
+            projectColors = updColors;
+
+        }
+
+        public void SaveColors()
+        {
+            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "color.json");
+            JSONSerialize(projectColors, filePath);
+        }
+
+        public void SaveColors(string filePath)
+        {
+            JSONSerialize(projectColors, filePath);
+        }
+
+        private void JSONSerialize(object data,string filePath)
+        {
+
+            JsonSerializer jsonSerializer = new JsonSerializer();
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+
+            using (StreamWriter sw = new StreamWriter(filePath))
+            {
+                JsonWriter jsonWriter = new JsonTextWriter(sw);
+                jsonSerializer.Serialize(jsonWriter, data);
+            }
+
+        }
+
+        private T JSONDeserialize<T>(string filePath)
+        {
+            object jObject = null;
+            JsonSerializer jsonSerializer = new JsonSerializer();
+            if (File.Exists(filePath))
+            {
+                using (StreamReader sr = new StreamReader(filePath))
+                {
+                    JsonReader jsonReader = new JsonTextReader(sr);
+                    jObject = jsonSerializer.Deserialize(jsonReader);
+                    
+                }
+            }
+            var x = JsonConvert.DeserializeObject<T>(jObject.ToString());
+            return x;
+
 
         }
 
@@ -138,7 +238,7 @@ namespace Toggl_API.APIHelper
 
             var choosedtimestamp = hours.Where(w => w.ProjectId == project.Id).ToList();
 
-            var projectChart = new ProjectChart(project.Name);
+            var projectChart = new ProjectChart(project.Name,(int)project.Id);
             projectChart.ClientID = (int)project.ClientId;
 
 
@@ -171,7 +271,7 @@ namespace Toggl_API.APIHelper
 
             var choosedtimestamp = hours.Where(w => w.ProjectId == project.Id).ToList();
 
-            var projectChart = new ProjectChart(project.Name);
+            var projectChart = new ProjectChart(project.Name,(int)project.Id);
             projectChart.ClientID = (int)project.ClientId;
 
 
@@ -209,7 +309,7 @@ namespace Toggl_API.APIHelper
 
                 var choosedtimestamp = hours.Where(w => w.ProjectId == project.Id).ToList();
 
-                var projectChart = new ProjectChart(project.Name);
+                var projectChart = new ProjectChart(project.Name,(int)project.Id);
 
                 projectChart.ClientID = (int)project.ClientId;
 
@@ -255,7 +355,7 @@ namespace Toggl_API.APIHelper
 
                 var choosedtimestamp = hours.Where(w => w.ProjectId == project.Id).ToList();
 
-                var projectChart = new ProjectChart(project.Name);
+                var projectChart = new ProjectChart(project.Name,(int)project.Id);
 
                 projectChart.ClientID = (int)project.ClientId;
 

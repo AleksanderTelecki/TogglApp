@@ -26,7 +26,7 @@ using Toggl_API;
 using Toggl_API.APIHelper;
 using Toggl_API.APIHelper.ClassModel;
 using Toggl_API.UserWindows.EditChart;
-
+using Toggl_API.UserWindows.EditColor;
 
 namespace Toggl_API
 {
@@ -75,7 +75,8 @@ namespace Toggl_API
 
             LoadBarChartData(projectCharts);
         }
-      
+
+
 
         private void LoadBarChartData(List<ProjectChart> projects)
         {
@@ -96,6 +97,7 @@ namespace Toggl_API
             List<double> initpositions = new List<double>();
             List<string> lables = new List<string>();
             List<double> timesums = new List<double>();
+            List<int> ids = new List<int>();
             int counter = 0;
 
             foreach (var item in projects)
@@ -104,6 +106,7 @@ namespace Toggl_API
                 initpositions.Add(counter);
                 lables.Add(item.ProjectName);
                 timesums.Add(item.TimeSum);
+                ids.Add(item.ProjectID);
                 counter++;
 
             }
@@ -118,7 +121,7 @@ namespace Toggl_API
 
                 var bar = WpfPlot.Plot.AddBar(new double[] {timesums[j] }, new double[] { initpositions[j] });
                 bar.ShowValuesAboveBars = true;
-                bar.FillColor = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+                bar.FillColor = helper.GetColor(ids[j]);
                 bar.Label = lables[j];
 
 
@@ -275,6 +278,53 @@ namespace Toggl_API
             }
         }
 
+        private void ExportReportByDayCVS_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "CSV file (*.csv)|*.csv| All Files (*.*)|*.*";
+            saveFileDialog.FileName = $"{((DateTime)DatePick_Start.SelectedDate).ToShortDateString()} - {((DateTime)DatePick_End.SelectedDate).ToShortDateString()}";
+            saveFileDialog.DefaultExt = ".csv";
+
+
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+
+                var columnNames = new[] { "Date", "Hours", "Projects" };
+
+                List<ProjectChart> projectCharts = new List<ProjectChart>();
+                if (editChart != null)
+                {
+                    projectCharts = EditChart.localProjects;
+                }
+                else
+                {
+                    projectCharts = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+                }
+
+                if (projectCharts.Count == 0)
+                {
+                    MessageBox.Show("Empty Chart!");
+                    return;
+                }
+
+                string[][] rows = new string[projectCharts.Count][];
+                for (int i = 0; i < projectCharts.Count; i++)
+                {
+                    rows[i] = new[] { $"{((DateTime)DatePick_Start.SelectedDate).ToShortDateString()} - {((DateTime)DatePick_End.SelectedDate).ToShortDateString()}", projectCharts[i].ProjectName, projectCharts[i].TimeSum.ToString(), projectCharts[i].TasksToCsv() };
+                }
+                var csv = CsvWriter.WriteToText(columnNames, rows, ';');
+                StringBuilder stringBuilder = new StringBuilder(csv);
+                stringBuilder.Insert(0, Environment.NewLine);
+                stringBuilder.Insert(0, $"Date Range: {((DateTime)DatePick_Start.SelectedDate).ToShortDateString()} - {((DateTime)DatePick_End.SelectedDate).ToShortDateString()}");
+                File.WriteAllText(saveFileDialog.FileName, stringBuilder.ToString(), Encoding.UTF8);
+
+            }
+        }
+
+
+
+
         private void Edit_Chart_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             editChart = new EditChart();
@@ -348,8 +398,20 @@ namespace Toggl_API
             UpdateDateWithoutPickerTriggers((DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
         }
 
+        public void Refresh()
+        {
+            UpdateDateWithoutPickerTriggers((DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
+        }
 
 
+        private void Edit_Color_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var editcolor = new EditColor();
+            editcolor.Owner = this;
+            editcolor.Show();
+        }
+
+        
 
 
 
