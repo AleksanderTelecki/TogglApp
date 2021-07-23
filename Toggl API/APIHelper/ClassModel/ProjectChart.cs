@@ -57,6 +57,34 @@ namespace Toggl_API.APIHelper.ClassModel
             return Math.Round(sum * 4, MidpointRounding.ToEven) / 4;
         }
 
+        public double GetTimeSum(DateTime date)
+        {
+
+            double sum = 0;
+            foreach (var item in TimePerTasks)
+            {
+                if (item.Date.Date==date)
+                {
+                    sum += item.Time;
+                }
+
+            }
+
+            return sum;
+
+        }
+
+        public string IsProjectWasInWork(DateTime date)
+        {
+            string result = "";
+            if (GetTimeSum(date)!=0)
+            {
+                result = ProjectName;
+            }
+
+            return result;
+        }
+
         public string TasksToCsv()
         {
 
