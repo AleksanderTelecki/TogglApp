@@ -61,25 +61,21 @@ namespace Toggl_API.APIHelper.ClassModel
         {
 
             double sum = 0;
-            foreach (var item in TimePerTasks)
+            foreach (var item in TimePerTasks.Where(w=>w.Date.Date==date))
             {
-                if (item.Date.Date==date)
-                {
-                    sum += item.Time;
-                }
-
+                sum += item.Time;
             }
 
-            return sum;
+            return Math.Round(sum * 4, MidpointRounding.ToEven) / 4;
 
         }
 
-        public string IsProjectWasInWork(DateTime date)
+        public bool IsProjectHasTask(DateTime date)
         {
-            string result = "";
+            bool result = false;
             if (GetTimeSum(date)!=0)
             {
-                result = ProjectName;
+                result = true;
             }
 
             return result;
@@ -109,6 +105,37 @@ namespace Toggl_API.APIHelper.ClassModel
             if (taskswithoutnames!=0)
             {
                 
+                sb.Append($"{taskswithoutnames} - Task Without Description, ");
+            }
+
+            return sb.ToString();
+
+        }
+
+        public string TasksToCsv(DateTime date)
+        {
+
+            StringBuilder sb = new StringBuilder();
+            int taskswithoutnames = 0;
+            foreach (var item in TimePerTasks.Where(w=>w.Date.Date==date))
+            {
+
+                if (String.IsNullOrEmpty(item.Description))
+                {
+                    taskswithoutnames++;
+                }
+                else
+                {
+                    sb.Append($"{item.Description}, ");
+                }
+
+
+
+            }
+
+            if (taskswithoutnames != 0)
+            {
+
                 sb.Append($"{taskswithoutnames} - Task Without Description, ");
             }
 

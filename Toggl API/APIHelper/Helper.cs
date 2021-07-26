@@ -74,23 +74,29 @@ namespace Toggl_API.APIHelper
 
         public Color GetColor(int id)
         {
-            return projectColors.First(w => w.ID == id).GetCurrentColor();
+            Color result = projectColors.First(w => w.ID == id).GetCurrentColor();
+            if (result==null)
+            {
+                updateColors(projectColors, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "color.json"));
+                result = projectColors.First(w => w.ID == id).GetCurrentColor();
+            }
+            return result;
         }
 
         private void updateColors(List<ProjectColor> updColors,string filePath)
         {
 
-            bool iscurrent = true;
+            bool allprojectsin = true;
             foreach (var item in Projects)
             {
                 if (!updColors.Exists(w => (w.ID == item.Id) && (w.Name == item.Name)))
                 {
                     updColors.Add(new ProjectColor(item.Name, (int)item.Id));
-                    iscurrent = false;
+                    allprojectsin = false;
                 }
             }
          
-            if (!iscurrent)
+            if (!allprojectsin)
             {
                 JSONSerialize(projectColors, filePath);
             }

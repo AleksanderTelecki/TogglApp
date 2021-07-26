@@ -290,7 +290,7 @@ namespace Toggl_API
             if (saveFileDialog.ShowDialog() == true)
             {
 
-                var columnNames = new[] { "Date", "Hours", "Projects" };
+                var columnNames = new[] { "Date", "Project", "Hours","Description" };
 
                 List<ProjectChart> projectCharts = new List<ProjectChart>();
                 if (editChart != null)
@@ -319,26 +319,24 @@ namespace Toggl_API
 
                 var dateAray = dateTimes.ToArray().Reverse().ToArray();
                 string[][] rows = new string[days][];
-                for (int i = 0; i < dateAray.Length; i++)
-                {
+           
 
-                    double hours = 0;
-                    StringBuilder projects = new StringBuilder();
-                    projects.Append("");
-                    foreach (var item in projectCharts)
+                int iterator = 0;
+                foreach (var date in dateAray)
+                {
+                  
+                    foreach (var project in projectCharts)
                     {
-                        hours += item.GetTimeSum(dateAray[i]);
-                        string projectname = item.IsProjectWasInWork(dateAray[i]);
-                        if (!String.IsNullOrEmpty(projectname))
+                        if (project.IsProjectHasTask(date))
                         {
-                            projects.Append($"{projectname}, ");
+                            rows[iterator] = new[] { $"{date.ToShortDateString()}", project.ProjectName, project.GetTimeSum(date).ToString(), project.TasksToCsv(date) };
+                            iterator++;
                         }
-                        
                     }
 
-                    hours = Math.Round(hours * 4, MidpointRounding.ToEven) / 4;
-                    rows[i] = new[] { $"{dateAray[i].ToShortDateString()}", hours.ToString(), projects.ToString() };
                 }
+
+
                 var csv = CsvWriter.WriteToText(columnNames, rows, ';');
                 StringBuilder stringBuilder = new StringBuilder(csv);
                 stringBuilder.Insert(0, Environment.NewLine);
