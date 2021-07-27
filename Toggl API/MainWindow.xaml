@@ -64,9 +64,11 @@
 
             <GridSplitter Grid.Row="1" BorderThickness="10" HorizontalAlignment="Stretch" BorderBrush="Gray" />
 
+            <Popup x:Name="PlotPopUp" Grid.Row="2" Placement="Mouse" StaysOpen="true"/>
+            <WpfPlot MouseMove="WpfPlot_MouseMove"  Grid.Row="2" Name="WpfPlot" >
+             
+            </WpfPlot>
 
-            <WpfPlot  Grid.Row="2" Name="WpfPlot" />
-           
 
         </Grid>
     </DockPanel>

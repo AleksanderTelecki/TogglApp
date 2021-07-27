@@ -18,6 +18,12 @@ namespace Toggl_API.APIHelper.ClassModel
 
         public int ClientID { get; set; }
 
+        public double X { get; set; }
+
+        public double Y { get; set; }
+        public double BarWidth { get; set; }
+
+
         public ProjectChart(string projectName,List<TimePerTask> timepertasks,int id)
         {
             ProjectID = id;
@@ -111,6 +117,39 @@ namespace Toggl_API.APIHelper.ClassModel
             return sb.ToString();
 
         }
+
+        public string TasksToPointLabel()
+        {
+
+            StringBuilder sb = new StringBuilder();
+            int taskswithoutnames = 0;
+            foreach (var item in TimePerTasks)
+            {
+
+                if (String.IsNullOrEmpty(item.Description))
+                {
+                    taskswithoutnames++;
+                }
+                else
+                {
+                    sb.AppendLine($"{item.Description}");
+                }
+
+
+
+            }
+
+            if (taskswithoutnames != 0)
+            {
+
+                sb.AppendLine($"{taskswithoutnames} - Task Without Description");
+            }
+
+            return sb.ToString();
+
+        }
+
+
 
         public string TasksToCsv(DateTime date)
         {

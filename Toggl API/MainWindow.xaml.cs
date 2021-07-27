@@ -1,6 +1,7 @@
 ﻿using Csv;
 using Microsoft.Win32;
 using ScottPlot;
+using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,9 +11,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -39,7 +42,6 @@ namespace Toggl_API
         public static ObservableCollection<ProjectChart> MainWindowProjects;
         public EditChart editChart;
         public (DateTime? Start, DateTime? End) oldDate;
-
         public MainWindow()
         {
 
@@ -66,9 +68,9 @@ namespace Toggl_API
             //Trace.WriteLine(helper.GetTotalProjectWorkTime(helper.Projects[0], "07/05/2021", "07/08/2021"));
             //LoadBarChartData(helper.GetProjectChart(helper.Projects[0]), helper.GetProjectChart(helper.Projects[1]));
 
-
-
         }
+
+
 
         public void RefreshChart(List<ProjectChart> projectCharts)
         {
@@ -123,11 +125,15 @@ namespace Toggl_API
                 bar.ShowValuesAboveBars = true;
                 bar.FillColor = helper.GetColor(ids[j]);
                 bar.Label = lables[j];
+                var project = MainWindowProjects.First(w => w.ProjectID == ids[j]);
+                project.X = initpositions[j];
+                project.Y = timesums[j];
+                project.BarWidth = bar.BarWidth;
 
 
             }
 
-
+            
             WpfPlot.Plot.YLabel("Hours");
             WpfPlot.Plot.Title($"Total Hours: {timesums.Sum()}");
             WpfPlot.Plot.SetAxisLimits(yMin: 0);
@@ -138,6 +144,48 @@ namespace Toggl_API
 
 
         }
+
+        private void WpfPlot_MouseMove(object sender, MouseEventArgs e)
+        {
+
+            (double x, double y) = WpfPlot.GetMouseCoordinates();
+            
+            foreach (var project in MainWindowProjects)
+            {
+                var px = project.X;
+                var py = project.Y;
+                var barwidth = project.BarWidth/2;
+
+                bool exist_x = (x >= (px - barwidth) && x <= (px + barwidth));
+                bool exist_y = (y >= 0 && y <= py);
+
+                if (exist_x && exist_y)
+                {
+                   
+                    TextBox textBox = new TextBox();
+                    textBox.Text = $"{project.TasksToPointLabel()}";
+                    PlotPopUp.Child = null;
+                    PlotPopUp.Child = textBox;
+                    PlotPopUp.IsOpen = true;
+
+                    return;
+                    
+                   
+                }
+               
+                
+               
+            }
+
+            PlotPopUp.IsOpen = false;
+
+
+
+        }
+
+
+
+
 
         private void DatePick_Start_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -381,8 +429,8 @@ namespace Toggl_API
             DatePick_Start.SelectedDate = startDate;
 
             var projects = helper.GetProjectChart(startDate, endDate);
-            LoadBarChartData(projects);
             MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
+            LoadBarChartData(projects);
             DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
             DatePick_Start.SelectedDateChanged += DatePick_Start_SelectedDateChanged;
 
@@ -435,7 +483,9 @@ namespace Toggl_API
             editcolor.Show();
         }
 
-        
+       
+
+
 
 
 
