@@ -368,10 +368,9 @@ namespace Toggl_API
                 }
 
                 var dateAray = dateTimes.ToArray().Reverse().ToArray();
-                string[][] rows = new string[days][];
+                List<string[]> rows = new List<string[]>();
            
 
-                int iterator = 0;
                 foreach (var date in dateAray)
                 {
                   
@@ -379,8 +378,7 @@ namespace Toggl_API
                     {
                         if (project.IsProjectHasTask(date))
                         {
-                            rows[iterator] = new[] { $"{date.ToShortDateString()}", project.ProjectName, project.GetTimeSum(date).ToString(), project.TasksToCsv(date) };
-                            iterator++;
+                            rows.Add(new[] { $"{date.ToShortDateString()}", project.ProjectName, project.GetTimeSum(date).ToString(), project.TasksToCsv(date) });
                         }
                     }
 
