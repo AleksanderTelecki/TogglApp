@@ -58,8 +58,10 @@ namespace Toggl_API
             DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
 
             var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
-            LoadBarChartData(projects);
             MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
+            LoadBarChartData(projects);
+            
+
 
             // TODO: EditWindow Synchronization with uncheked checkboxes when close the window
 
