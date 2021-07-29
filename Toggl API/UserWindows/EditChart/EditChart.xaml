@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Toggl_API.UserWindows.EditChart"
         mc:Ignorable="d"
-     Title="EditChart" Height="350" Width="350">
+     Title="EditChart" Icon="/Resources/StackedColumnSeries.ico" Height="350" Width="350">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

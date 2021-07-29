@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Toggl;
 using Toggl.Extensions;
@@ -297,7 +298,7 @@ namespace Toggl_API.APIHelper
 
         }
 
-        public List<ProjectChart> GetProjectChart(DateTime? startdate, DateTime? enddate)
+        public async Task<List<ProjectChart>> GetProjectChartAsync(DateTime? startdate, DateTime? enddate)
         {
 
 
@@ -306,7 +307,7 @@ namespace Toggl_API.APIHelper
             prams.StartDate = startdate;
             prams.EndDate = enddate;
 
-            var hours = TimeEntryService.List(prams);
+            var hours = await System.Threading.Tasks.Task.FromResult(TimeEntryService.List(prams));
 
             List<ProjectChart> projectCharts = new List<ProjectChart>();
             foreach (var project in Projects)
@@ -327,6 +328,7 @@ namespace Toggl_API.APIHelper
                         continue;
                     }
                     projectChart.AddTask(item.Description, TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours, Convert.ToDateTime(item.Stop));
+                    
                 }
 
 
@@ -335,8 +337,56 @@ namespace Toggl_API.APIHelper
                     projectCharts.Add(projectChart);
                 }
 
+                
+
             }
 
+            return projectCharts;
+
+        }
+
+        public List<ProjectChart> GetProjectChart(DateTime? startdate, DateTime? enddate)
+        {
+
+
+            var prams = new TimeEntryParams();
+
+            prams.StartDate = startdate;
+            prams.EndDate = enddate;
+
+            var hours = TimeEntryService.List(prams);
+
+            List<ProjectChart> projectCharts = new List<ProjectChart>();
+            foreach (var project in Projects)
+            {
+
+
+                var choosedtimestamp = hours.Where(w => w.ProjectId == project.Id).ToList();
+
+                var projectChart = new ProjectChart(project.Name, (int)project.Id);
+
+                projectChart.ClientID = (int)project.ClientId;
+
+
+                foreach (var item in choosedtimestamp)
+                {
+                    if (TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours < 0)
+                    {
+                        continue;
+                    }
+                    projectChart.AddTask(item.Description, TimeSpan.FromSeconds(Convert.ToDouble(item.Duration)).TotalHours, Convert.ToDateTime(item.Stop));
+
+                }
+
+
+                if (projectChart.TimePerTasks.Count != 0)
+                {
+                    projectCharts.Add(projectChart);
+                }
+
+
+
+            }
 
 
             return projectCharts;

@@ -40,11 +40,6 @@ namespace Toggl_API.UserWindows.EditColor
         }
 
 
-        private void ColorPicker_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
-        {
-
-        }
-
         private void ColorPicker_LostFocus(object sender, RoutedEventArgs e)
         {
             ((MainWindow)this.Owner).Refresh();

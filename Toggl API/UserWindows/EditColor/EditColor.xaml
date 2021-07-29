@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Toggl_API.UserWindows.EditColor"
         xmlns:wpfTool="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
         mc:Ignorable="d"
-        Title="EditColor" Height="450" Width="300">
+        Title="EditColor" Icon="/Resources/StackedColumnSeries.ico" Height="450" Width="300">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
@@ -30,7 +30,7 @@
                     <DataTemplate>
                         <StackPanel Margin="5">
                             <TextBlock Text="{Binding Path=Name}"/>
-                            <wpfTool:ColorPicker LostFocus="ColorPicker_LostFocus" SelectedColorChanged="ColorPicker_SelectedColorChanged" SelectedColor="{Binding Path=Color,UpdateSourceTrigger=LostFocus,Mode=TwoWay}"/>
+                            <wpfTool:ColorPicker LostFocus="ColorPicker_LostFocus"  SelectedColor="{Binding Path=Color,UpdateSourceTrigger=LostFocus,Mode=TwoWay}"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

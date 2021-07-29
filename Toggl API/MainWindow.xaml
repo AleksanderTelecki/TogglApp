@@ -4,8 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Toggl_API"
+        xmlns:loadin="clr-namespace:LoadingIndicators.WPF;assembly=LoadingIndicators.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="660">
+        Title="MainWindow" Icon="/Resources/StackedColumnSeries.ico" Height="450" Width="660" Closing="Window_Closing" StateChanged="Window_StateChanged" IsVisibleChanged="Window_IsVisibleChanged" >
+   
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/LoadingIndicators.WPF;component/Styles/LoadingDoubleBounce.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/LoadingIndicators.WPF;component/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
@@ -65,8 +76,8 @@
             <GridSplitter Grid.Row="1" BorderThickness="10" HorizontalAlignment="Stretch" BorderBrush="Gray" />
 
             <Popup x:Name="PlotPopUp" Grid.Row="2" Placement="Mouse" StaysOpen="true"/>
+            <loadin:LoadingIndicator Name="LoadingIndicator" Grid.Row="2" HorizontalAlignment="Center" IsActive="False" VerticalAlignment="Center" Panel.ZIndex="1" Style="{DynamicResource LoadingIndicatorWaveStyle}" />
             <WpfPlot MouseMove="WpfPlot_MouseMove"  Grid.Row="2" Name="WpfPlot" >
-             
             </WpfPlot>
 
 

@@ -38,18 +38,28 @@ namespace Toggl_API
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static Helper helper;
-        public static ObservableCollection<ProjectChart> MainWindowProjects;
-        public EditChart editChart;
-        public (DateTime? Start, DateTime? End) oldDate;
+
+        #region GlobalVariables
+        public static Helper helper;//Helper Class
+        public static ObservableCollection<ProjectChart> MainWindowProjects;//Observable Collection for editing chart and bar tooltip
+        public EditChart editChart;//Edit window instance
+        public (DateTime? Start, DateTime? End) oldDate;//Variable for saving previous dates
+
+        private System.Windows.Forms.NotifyIcon notifyIcon;//To put app to windows tray
+        private WindowState storedWindowState = WindowState.Normal;//Windows state
+        #endregion
+
+
         public MainWindow()
         {
 
             InitializeComponent();
+            //Global Variables initialization
             helper = new Helper();
             MainWindowProjects = new ObservableCollection<ProjectChart>();
 
 
+            //Setting today's date and events to DatePicker's
             DatePick_Start.SelectedDate = DateTime.Now.Date;
             DatePick_End.SelectedDate = DateTime.Now.AddDays(1).Date;
             oldDate.Start = DateTime.Now.Date;
@@ -57,22 +67,76 @@ namespace Toggl_API
             DatePick_Start.SelectedDateChanged += DatePick_Start_SelectedDateChanged;
             DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
 
-            var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
-            MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
-            LoadBarChartData(projects);
-            
+
+            //Getting Today Data from Toggl API and Chart initialization
+            InitializeChart();
 
 
-            // TODO: EditWindow Synchronization with uncheked checkboxes when close the window
-
-            //Trace.WriteLine(helper.GetClientProjectTimeTrack("Klient 1", "07/05/2021", "07/08/2021"));
-            //Trace.WriteLine("");
-            //Trace.WriteLine(helper.GetTotalProjectWorkTime(helper.Projects[0], "07/05/2021", "07/08/2021"));
-            //LoadBarChartData(helper.GetProjectChart(helper.Projects[0]), helper.GetProjectChart(helper.Projects[1]));
+            //Initialize NotifiIcon
+            notifyIcon = new System.Windows.Forms.NotifyIcon();
+            notifyIcon.BalloonTipText = "The app has been minimised. Click the tray icon to show.";
+            notifyIcon.BalloonTipTitle = "Toggl Chart";
+            notifyIcon.Text = "Toggl Chart";
+            Stream iconStream = Application.GetResourceStream(new Uri("pack://application:,,,/Toggl API;component/Resources/StackedColumnSeries.ico")).Stream;
+            notifyIcon.Icon = new System.Drawing.Icon(iconStream);
+            notifyIcon.Click += notifyIcon_Click;
 
         }
 
+        public async void InitializeChart()
+        {
+            var projects = await helper.GetProjectChartAsync(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+            MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
+            LoadBarChartData(projects);
+        }
 
+        #region AppToTrayImplementation
+        private void notifyIcon_Click(object sender, EventArgs e)
+        {
+            Show();
+            WindowState = storedWindowState;
+
+        }
+
+        void CheckTrayIcon()
+        {
+            ShowTrayIcon(!IsVisible);
+        }
+
+        void ShowTrayIcon(bool show)
+        {
+            if (notifyIcon != null)
+                notifyIcon.Visible = show;
+        }
+
+        private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            CheckTrayIcon();
+        }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            if (WindowState == WindowState.Minimized)
+            {
+                Hide();
+                if (notifyIcon != null)
+                    notifyIcon.ShowBalloonTip(2000);
+            }
+            else
+                storedWindowState = WindowState;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            notifyIcon.Dispose();
+            notifyIcon = null;
+
+        }
+
+        #endregion
+
+
+        #region ChartImplementation
 
         public void RefreshChart(List<ProjectChart> projectCharts)
         {
@@ -91,6 +155,7 @@ namespace Toggl_API
 
             if (projects.Count==0)
             {
+                LoadingIndicator.IsActive = false;
                 return;
             }
 
@@ -140,7 +205,7 @@ namespace Toggl_API
             WpfPlot.Plot.Title($"Total Hours: {timesums.Sum()}");
             WpfPlot.Plot.SetAxisLimits(yMin: 0);
 
-
+            LoadingIndicator.IsActive = false;
 
 
 
@@ -189,7 +254,7 @@ namespace Toggl_API
 
 
 
-        private void DatePick_Start_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        private async void DatePick_Start_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
 
             if (DatePick_Start.SelectedDate > DatePick_End.SelectedDate)
@@ -201,7 +266,8 @@ namespace Toggl_API
 
             if (DatePick_End.SelectedDate!=null&& DatePick_Start.SelectedDate != null)
             {
-                var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+                LoadingIndicator.IsActive = true;
+                var projects = await helper.GetProjectChartAsync(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
                 MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
                 if (editChart!=null)
                 {
@@ -213,7 +279,7 @@ namespace Toggl_API
             }
         }
 
-        private void DatePick_End_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        private async void DatePick_End_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             
 
@@ -226,7 +292,9 @@ namespace Toggl_API
 
             if (DatePick_End.SelectedDate != null && DatePick_Start.SelectedDate != null)
             {
-                var projects = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+
+                LoadingIndicator.IsActive = true;
+                var projects =await helper.GetProjectChartAsync(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
                 MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
                 if (editChart != null)
                 {
@@ -236,6 +304,74 @@ namespace Toggl_API
                 oldDate.End = DatePick_End.SelectedDate;
             }
         }
+
+        private async void UpdateDateWithoutPickerTriggers(DateTime startDate, DateTime endDate)
+        {
+            DatePick_Start.SelectedDateChanged -= DatePick_Start_SelectedDateChanged;
+            DatePick_End.SelectedDateChanged -= DatePick_End_SelectedDateChanged;
+
+            DatePick_End.SelectedDate = endDate;
+            DatePick_Start.SelectedDate = startDate;
+
+            LoadingIndicator.IsActive = true;
+            var projects = await helper.GetProjectChartAsync(startDate, endDate);
+            MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
+            LoadBarChartData(projects);
+            DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
+            DatePick_Start.SelectedDateChanged += DatePick_Start_SelectedDateChanged;
+
+            oldDate.Start = startDate;
+            oldDate.End = endDate;
+
+        }
+
+        private void Minus_Click(object sender, RoutedEventArgs e)
+        {
+            DateTime startDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(-1).Date;
+            DateTime endDate = ((DateTime)DatePick_End.SelectedDate).AddDays(-1).Date;
+            UpdateDateWithoutPickerTriggers(startDate, endDate);
+
+        }
+
+        private void Plus_Click(object sender, RoutedEventArgs e)
+        {
+            DateTime startDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(1).Date;
+            DateTime endDate = ((DateTime)DatePick_End.SelectedDate).AddDays(1).Date;
+            UpdateDateWithoutPickerTriggers(startDate, endDate);
+
+        }
+
+
+
+        private void CurrMonth_Button_Click(object sender, RoutedEventArgs e)
+        {
+            DateTime now = DateTime.Now.Date;
+            var startDate = new DateTime(now.Year, now.Month, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1).AddHours(23).AddMinutes(59).AddSeconds(59);
+            UpdateDateWithoutPickerTriggers(startDate, endDate);
+
+        }
+
+
+        private void CurrWeek_Button_Click(object sender, RoutedEventArgs e)
+        {
+            DateTime now = DateTime.Now.Date;
+            var startDate = now.FirstDayOfWeek();
+            var endDate = now.LastDayOfWeek().AddHours(23).AddMinutes(59).AddSeconds(59);
+            UpdateDateWithoutPickerTriggers(startDate, endDate);
+        }
+
+        private void CurrDay_Button_Click(object sender, RoutedEventArgs e)
+        {
+            var startDate = DateTime.Now.Date;
+            var endDate = DateTime.Now.AddDays(1).Date;
+            UpdateDateWithoutPickerTriggers(startDate, endDate);
+        }
+
+        #endregion
+
+
+        #region ExportToCVS
 
         private void ExportCVS_MenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -349,7 +485,7 @@ namespace Toggl_API
                 }
                 else
                 {
-                    projectCharts = helper.GetProjectChart(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
+                    projectCharts = helper.GetProjectChartAsync(DatePick_Start.SelectedDate, DatePick_End.SelectedDate).Result;
                 }
 
                 if (projectCharts.Count == 0)
@@ -395,84 +531,13 @@ namespace Toggl_API
         }
 
 
-
+        #endregion
 
         private void Edit_Chart_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             editChart = new EditChart();
             editChart.Owner = this;
             editChart.Show();
-        }
-
-        private void Minus_Click(object sender, RoutedEventArgs e)
-        {
-            DateTime startDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(-1).Date;
-            DateTime endDate = ((DateTime)DatePick_End.SelectedDate).AddDays(-1).Date;
-            UpdateDateWithoutPickerTriggers(startDate, endDate);
-
-        }
-
-        private void Plus_Click(object sender, RoutedEventArgs e)
-        {
-            DateTime startDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(1).Date;
-            DateTime endDate = ((DateTime)DatePick_End.SelectedDate).AddDays(1).Date;
-            UpdateDateWithoutPickerTriggers(startDate, endDate);
-           
-        }
-
-        private void UpdateDateWithoutPickerTriggers(DateTime startDate,DateTime endDate)
-        {
-            DatePick_Start.SelectedDateChanged -= DatePick_Start_SelectedDateChanged;
-            DatePick_End.SelectedDateChanged -= DatePick_End_SelectedDateChanged;
-
-            DatePick_End.SelectedDate = endDate;
-            DatePick_Start.SelectedDate = startDate;
-
-            var projects = helper.GetProjectChart(startDate, endDate);
-            MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
-            LoadBarChartData(projects);
-            DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
-            DatePick_Start.SelectedDateChanged += DatePick_Start_SelectedDateChanged;
-
-            oldDate.Start = startDate;
-            oldDate.End = endDate;
-
-        }
-
-        private void CurrMonth_Button_Click(object sender, RoutedEventArgs e)
-        {
-            DateTime now = DateTime.Now.Date;
-            var startDate = new DateTime(now.Year, now.Month, 1);
-            var endDate = startDate.AddMonths(1).AddDays(-1).AddHours(23).AddMinutes(59).AddSeconds(59);
-            UpdateDateWithoutPickerTriggers(startDate, endDate);
-
-        }
-
-    
-        private void CurrWeek_Button_Click(object sender, RoutedEventArgs e)
-        {
-            DateTime now = DateTime.Now.Date;
-            var startDate = now.FirstDayOfWeek();
-            var endDate = now.LastDayOfWeek().AddHours(23).AddMinutes(59).AddSeconds(59);
-            UpdateDateWithoutPickerTriggers(startDate, endDate);
-        }
-
-        private void CurrDay_Button_Click(object sender, RoutedEventArgs e)
-        {
-            var startDate = DateTime.Now.Date;
-            var endDate = DateTime.Now.AddDays(1).Date;
-            UpdateDateWithoutPickerTriggers(startDate, endDate);
-        }
-
-        private void Refresh_MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
-            UpdateDateWithoutPickerTriggers((DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
-        }
-
-        public void Refresh()
-        {
-            UpdateDateWithoutPickerTriggers((DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
         }
 
 
@@ -483,102 +548,16 @@ namespace Toggl_API
             editcolor.Show();
         }
 
-       
+        public void Refresh()
+        {
+            UpdateDateWithoutPickerTriggers((DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
+        }
 
-
-
-
-
-
-        //Project
-        //var project = new Project
-        //{
-        //    IsBillable = true,
-        //    WorkspaceId = WorkspaceID,
-        //    Name = "Project 2",
-        //    IsAutoEstimates = false,
-        //    ClientId = clients[0].Id,
-        //    IsActive = true,
-        //};
-        //var act = PService.Add(project);
-
-
-
-
-
-
-
-
-
-        //var TService = new Toggl.Services.TaskService(apiKey);
-        //var task = TService.ForProject((int)ProjectID);
-        //var loadedTask = TService.Get((int)task[0].Id);
-        //loadedTask.IsActive = false;
-        //var editedTask = TService.Edit(loadedTask);
-
-        //helper.AddTask((int) helper.Projects[0].Id, "Requirements Specification",true,3600*20);
-        //    helper.AddTask((int) helper.Projects[0].Id, "Project Planning", true, 3600*10);
-        //    helper.AddTask((int) helper.Projects[0].Id, "System Creation", true, 3600*70);
-        //    helper.AddTask((int) helper.Projects[0].Id, "DataBase Creation", true, 3600*30);
-        //    helper.AddTask((int) helper.Projects[0].Id, "BugFixing", true, 3600*35);
-        //    helper.AddTask((int) helper.Projects[0].Id, "Testing", true, 3600*25);
-
-        //    helper.AddTask((int) helper.Projects[1].Id, "Requirements Specification", true, 3600*20);
-        //    helper.AddTask((int) helper.Projects[1].Id, "Project Planning", true, 3600*12);
-        //    helper.AddTask((int) helper.Projects[1].Id, "System Designing", true, 3600*15);
-        //    helper.AddTask((int) helper.Projects[1].Id, "Server Creation", true, 3600*30);
-        //    helper.AddTask((int) helper.Projects[1].Id, "Web-Services Configuration", true, 3600*35);
-        //    helper.AddTask((int) helper.Projects[1].Id, "System Configuration", true, 3600*10);
-        //    helper.AddTask((int) helper.Projects[1].Id, "Testing", true, 3600*10);
-
-        //helper.AddTimeEntries(helper.Projects[0], "Requirements Specification", 3600 * 1, "Client Meeting 0.1");
-        //helper.AddTimeEntries(helper.Projects[0], "Project Planning", 3600 * 2, "Gant Diagram 0.1");
-        //helper.AddTimeEntries(helper.Projects[0], "System Creation", 3600 * 4, "System Main UseCase 0.1");
-        //helper.AddTimeEntries(helper.Projects[0], "DataBase Creation", 3600 * 5, "Entity Diagram 0.1");
-        //helper.AddTimeEntries(helper.Projects[0], "BugFixing", 3600 * 1, "System Check 0.1");
-        //helper.AddTimeEntries(helper.Projects[0], "Testing", 3600 * 1, "Testing 0.1");
-
-
-
-        //helper.AddTimeEntries(helper.Projects[1], "Requirements Specification", 3600 * 2, "Client Meeting 0.1");
-        //helper.AddTimeEntries(helper.Projects[1], "Project Planning", 3600 * 3, "Main Project Plan 0.1");
-        //helper.AddTimeEntries(helper.Projects[1], "System Designing", 3600 * 4, "Designer UI Template 0.1");
-        //helper.AddTimeEntries(helper.Projects[1], "Server Creation", 3600 * 5, "Server Creation 0.1");
-        //helper.AddTimeEntries(helper.Projects[1], "Web-Services Configuration", 3600 * 5, "Adding WebServices 0.1");
-        //helper.AddTimeEntries(helper.Projects[1], "System Configuration", 3600 * 3, "System Configuration 0.1");
-        //helper.AddTimeEntries(helper.Projects[1], "Testing", 3600 * 2, "Testing 0.1");
-
-        //helper.AddTimeEntries(helper.Projects[0], "Requirements Specification", 3600 * 1, "Requirements Analyse");
-        //helper.AddTimeEntries(helper.Projects[0], "Project Planning", 3600 * 2, "Gant Diagram 0.2");
-        //helper.AddTimeEntries(helper.Projects[0], "System Creation", 3600 * 4, "System Main Class Diagram");
-        //helper.AddTimeEntries(helper.Projects[0], "DataBase Creation", 3600 * 5, "DB projecting");
-        //helper.AddTimeEntries(helper.Projects[0], "BugFixing", 3600 * 1, "System Check 0.2");
-        //helper.AddTimeEntries(helper.Projects[0], "Testing", 3600 * 1, "Testing 0.2");
-
-
-
-        //helper.AddTimeEntries(helper.Projects[1], "Requirements Specification", 3600 * 2, "Client Meeting 0.2");
-        //helper.AddTimeEntries(helper.Projects[1], "Project Planning", 3600 * 3, "Team managment 0.1");
-        //helper.AddTimeEntries(helper.Projects[1], "System Designing", 3600 * 1, "Designer UI Template 0.2");
-        //helper.AddTimeEntries(helper.Projects[1], "Server Creation", 3600 * 2, "Server Configuration 0.1");
-        //helper.AddTimeEntries(helper.Projects[1], "Web-Services Configuration", 3600 * 1, "WebServices Configuration 0.1");
-        //helper.AddTimeEntries(helper.Projects[1], "System Configuration", 3600 * 3, "System Configuration 0.2");
-        //helper.AddTimeEntries(helper.Projects[1], "Testing", 3600 * 2, "Testing 0.2");
-
-
-
-
-        //var reports = new Toggl.Services.ReportService(Helper.APIToken);
-
-
-        //var standardParams = new DetailedReportParams()
-        //{
-        //    UserAgent = "TogglAPI.Net",
-        //    WorkspaceId = (int)helper.WorkSpaceID
-        //};
-
-        //var z = reports.Detailed(standardParams);
-
+        private void Refresh_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Refresh();
+      
+        }
 
 
 
