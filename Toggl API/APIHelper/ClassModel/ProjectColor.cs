@@ -35,7 +35,10 @@ namespace Toggl_API.APIHelper.ClassModel
 
         }
 
-
+        /// <summary>
+        /// Method for getting color in System.Drawing.Color format
+        /// </summary>
+        /// <returns>System.Drawing.Color</returns>
         public System.Drawing.Color GetCurrentColor()
         {
 

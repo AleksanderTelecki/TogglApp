@@ -52,6 +52,11 @@ namespace Toggl_API.APIHelper.ClassModel
 
         }
 
+
+        /// <summary>
+        /// Method for getting sum of time entries in tasks
+        /// </summary>
+        /// <returns>Double Time Sum</returns>
         private double GetTimeSum()
         {
             double sum = 0;
@@ -63,6 +68,11 @@ namespace Toggl_API.APIHelper.ClassModel
             return Math.Round(sum * 4, MidpointRounding.ToEven) / 4;
         }
 
+        /// <summary>
+        /// Method for getting sum of time entries in tasks by date
+        /// </summary>
+        /// <param name="date">Specified Date</param>
+        /// <returns>Double Time Sum by date</returns>
         public double GetTimeSum(DateTime date)
         {
 
@@ -76,6 +86,11 @@ namespace Toggl_API.APIHelper.ClassModel
 
         }
 
+        /// <summary>
+        /// Method that checks is project has active tasks in the range of specified date
+        /// </summary>
+        /// <param name="date">Specified Date</param>
+        /// <returns>Boolean value that represents is project has active task in the range of specified date</returns>
         public bool IsProjectHasTask(DateTime date)
         {
             bool result = false;
@@ -87,6 +102,10 @@ namespace Toggl_API.APIHelper.ClassModel
             return result;
         }
 
+        /// <summary>
+        /// Method that converts task descriptions to cvs format 
+        /// </summary>
+        /// <returns>String with tasks description in cvs format</returns>
         public string TasksToCsv()
         {
 
@@ -118,6 +137,10 @@ namespace Toggl_API.APIHelper.ClassModel
 
         }
 
+        /// <summary>
+        /// Method that converts tasks description to label point format
+        /// </summary>
+        /// <returns>String with tasks description which converted to label point format </returns>
         public string TasksToPointLabel()
         {
 
@@ -150,7 +173,12 @@ namespace Toggl_API.APIHelper.ClassModel
         }
 
 
-
+       
+        /// <summary>
+        ///  Method that converts task descriptions to cvs format by specified date
+        /// </summary>
+        /// <param name="date">Specified Date</param>
+        /// <returns>String with tasks description in cvs format by date</returns>
         public string TasksToCsv(DateTime date)
         {
 
@@ -182,6 +210,11 @@ namespace Toggl_API.APIHelper.ClassModel
 
         }
 
+
+        /// <summary>
+        /// Method that gets list with task distinct date 
+        /// </summary>
+        /// <returns>List of task distinct date</returns>
         public List<DateTime> GetDistinctDate()
         {
 
@@ -196,6 +229,11 @@ namespace Toggl_API.APIHelper.ClassModel
 
         }
 
+        /// <summary>
+        /// Method that gets ProjectChart object by date
+        /// </summary>
+        /// <param name="dateTime">Specified Date</param>
+        /// <returns>ProjectChart by date</returns>
         public ProjectChart GetProjectByDate(DateTime dateTime)
         {
             ProjectChart projectChart = new ProjectChart(ProjectName, ProjectID);
@@ -224,12 +262,6 @@ namespace Toggl_API.APIHelper.ClassModel
             Time =time;
             Date = date;
         }
-
-        public override string ToString()
-        {
-            return base.ToString();
-        }
-
 
     }
 }

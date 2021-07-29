@@ -83,6 +83,9 @@ namespace Toggl_API
 
         }
 
+        /// <summary>
+        /// Function for initialize initial parameters asynchronously
+        /// </summary>
         public async void InitializeChart()
         {
             var projects = await helper.GetProjectChartAsync(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
@@ -91,6 +94,12 @@ namespace Toggl_API
         }
 
         #region AppToTrayImplementation
+
+        /// <summary>
+        /// EventHandler for Click event on notifyicon, shows window after click on icon
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void notifyIcon_Click(object sender, EventArgs e)
         {
             Show();
@@ -98,22 +107,40 @@ namespace Toggl_API
 
         }
 
+        /// <summary>
+        /// Function that check trayicon
+        /// </summary>
         void CheckTrayIcon()
         {
             ShowTrayIcon(!IsVisible);
         }
 
+        /// <summary>
+        /// Function shows tray icon if notifyicon do not null
+        /// </summary>
+        /// <param name="show"></param>
         void ShowTrayIcon(bool show)
         {
             if (notifyIcon != null)
                 notifyIcon.Visible = show;
         }
 
+        /// <summary>
+        /// EventHandler that check tray icon
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             CheckTrayIcon();
         }
 
+
+        /// <summary>
+        /// EventHandler for windows states changes, after window hide shows tray icon 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_StateChanged(object sender, EventArgs e)
         {
             if (WindowState == WindowState.Minimized)
@@ -126,6 +153,12 @@ namespace Toggl_API
                 storedWindowState = WindowState;
         }
 
+
+        /// <summary>
+        /// EventHandler for window closing ,clears notifyicon object 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             notifyIcon.Dispose();
@@ -138,6 +171,10 @@ namespace Toggl_API
 
         #region ChartImplementation
 
+        /// <summary>
+        /// Function that refresh chart from edit window
+        /// </summary>
+        /// <param name="projectCharts"></param>
         public void RefreshChart(List<ProjectChart> projectCharts)
         {
 
@@ -145,7 +182,10 @@ namespace Toggl_API
         }
 
 
-
+        /// <summary>
+        /// Main function that visualizes the data received 
+        /// </summary>
+        /// <param name="projects"></param>
         private void LoadBarChartData(List<ProjectChart> projects)
         {
 
@@ -212,6 +252,12 @@ namespace Toggl_API
 
         }
 
+
+        /// <summary>
+        /// EventHandler for mouse move, that visualizes bar tooltip
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void WpfPlot_MouseMove(object sender, MouseEventArgs e)
         {
 
@@ -253,7 +299,11 @@ namespace Toggl_API
 
 
 
-
+        /// <summary>
+        /// EventHandler for selected date changes, sets new date range to startdate 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void DatePick_Start_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
 
@@ -279,6 +329,11 @@ namespace Toggl_API
             }
         }
 
+        /// <summary>
+        /// EventHandler for selected date changes, sets new date range to enddate 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void DatePick_End_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             
@@ -305,6 +360,12 @@ namespace Toggl_API
             }
         }
 
+
+        /// <summary>
+        ///Function that sets new range for startdate and enddate without trigger the events DatePick_End_SelectedDateChanged and DatePick_Start_SelectedDateChanged
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
         private async void UpdateDateWithoutPickerTriggers(DateTime startDate, DateTime endDate)
         {
             DatePick_Start.SelectedDateChanged -= DatePick_Start_SelectedDateChanged;
@@ -325,6 +386,12 @@ namespace Toggl_API
 
         }
 
+
+        /// <summary>
+        /// EventHandler for '-' button click ,subtracts one from the specified date
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Minus_Click(object sender, RoutedEventArgs e)
         {
             DateTime startDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(-1).Date;
@@ -333,6 +400,12 @@ namespace Toggl_API
 
         }
 
+
+        /// <summary>
+        /// EventHandler for '+' button click, adds one from the specified date
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Plus_Click(object sender, RoutedEventArgs e)
         {
             DateTime startDate = ((DateTime)DatePick_Start.SelectedDate).AddDays(1).Date;
@@ -342,7 +415,11 @@ namespace Toggl_API
         }
 
 
-
+        /// <summary>
+        /// EventHandler for 'Current Month' button click, sets date range to the current month
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CurrMonth_Button_Click(object sender, RoutedEventArgs e)
         {
             DateTime now = DateTime.Now.Date;
@@ -352,7 +429,11 @@ namespace Toggl_API
 
         }
 
-
+        /// <summary>
+        ///  EventHandler for 'Current Week' button click, sets date range to the current week
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CurrWeek_Button_Click(object sender, RoutedEventArgs e)
         {
             DateTime now = DateTime.Now.Date;
@@ -361,6 +442,12 @@ namespace Toggl_API
             UpdateDateWithoutPickerTriggers(startDate, endDate);
         }
 
+
+        /// <summary>
+        ///  EventHandler for 'Current Day' button click, sets date range to the current day
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CurrDay_Button_Click(object sender, RoutedEventArgs e)
         {
             var startDate = DateTime.Now.Date;
@@ -373,6 +460,11 @@ namespace Toggl_API
 
         #region ExportToCVS
 
+        /// <summary>
+        /// EventHandler for 'Export Full Report' menuitem click, export data from Toggl API to CVS file in specified format  
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ExportCVS_MenuItem_Click(object sender, RoutedEventArgs e)
         {
 
@@ -420,6 +512,12 @@ namespace Toggl_API
 
         }
 
+
+        /// <summary>
+        /// EventHandler for 'Export Chart Report' menuitem click, export data from chart to CVS file in specified format
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ExportChartCVS_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -464,6 +562,13 @@ namespace Toggl_API
             }
         }
 
+
+
+        /// <summary>
+        /// EventHandler for 'Export Report By Day' menuitem click, export data from choosed date range to CVS file in specified format
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ExportReportByDayCVS_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -533,6 +638,13 @@ namespace Toggl_API
 
         #endregion
 
+
+
+        /// <summary>
+        /// EventHandler for 'Edit Chart' menuitem click, shows the edit chart window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Edit_Chart_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             editChart = new EditChart();
@@ -540,7 +652,11 @@ namespace Toggl_API
             editChart.Show();
         }
 
-
+        /// <summary>
+        /// EventHandler for 'Edit Colors' menuitem click, shows the edit colors window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Edit_Color_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             var editcolor = new EditColor();
@@ -548,11 +664,21 @@ namespace Toggl_API
             editcolor.Show();
         }
 
+
+        /// <summary>
+        /// Function that refreshs chart values
+        /// </summary>
         public void Refresh()
         {
             UpdateDateWithoutPickerTriggers((DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
         }
 
+
+        /// <summary>
+        /// EventHandler for 'Refresh' menuitem click, refreshs chart values
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Refresh_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             Refresh();

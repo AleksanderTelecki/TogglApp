@@ -26,6 +26,12 @@ namespace Toggl_API.UserWindows.EditColor
 
         }
 
+
+        /// <summary>
+        /// EventHandler for 'Export' menuitem click, export color.json file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Export_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -40,6 +46,11 @@ namespace Toggl_API.UserWindows.EditColor
         }
 
 
+        /// <summary>
+        /// Function that updates and save choosed colors on chart 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ColorPicker_LostFocus(object sender, RoutedEventArgs e)
         {
             ((MainWindow)this.Owner).Refresh();

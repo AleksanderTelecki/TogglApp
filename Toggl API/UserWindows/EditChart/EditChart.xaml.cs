@@ -22,8 +22,8 @@ namespace Toggl_API.UserWindows.EditChart
     /// </summary>
     public partial class EditChart : Window
     {
-        EditChartViewModel editChartViewModel;
-        public static List<ProjectChart> localProjects;
+        EditChartViewModel editChartViewModel;//Global variable for EditChartViewModel instance
+        public static List<ProjectChart> localProjects;// Local project on chart
         public EditChart()
         {
             InitializeComponent();
@@ -33,6 +33,12 @@ namespace Toggl_API.UserWindows.EditChart
             localProjects = MainWindow.MainWindowProjects.ToList();
         }
 
+
+        /// <summary>
+        /// EventHandler for CheckBox Checked event, changes the project side property in viewmodel and recieve new values to chart
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             var addedprojects = MainWindow.MainWindowProjects.Where(w => w.ProjectName == ((CheckBox)sender).Content.ToString()).ToList();
@@ -72,6 +78,12 @@ namespace Toggl_API.UserWindows.EditChart
 
         }
 
+
+        /// <summary>
+        ///  EventHandler for CheckBox Uncheked event, changes the project side property in viewmodel and recieve new values to chart
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             
@@ -111,6 +123,12 @@ namespace Toggl_API.UserWindows.EditChart
             RefreshChart();
         }
 
+
+        /// <summary>
+        /// EventHandler for CheckBox Cheked event, changes the client side property in viewmodel and recieve new values to chart
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CheckBox_Checked_Client(object sender, RoutedEventArgs e)
         {
             var addedprojects = ((EditChartViewModel)DataContext).Projects.Where(w => w.Project.ClientID == MainWindow.helper.ClientService.GetByName(((CheckBox)sender).Content.ToString()).Id);
@@ -121,6 +139,11 @@ namespace Toggl_API.UserWindows.EditChart
 
         }
 
+        /// <summary>
+        /// EventHandler for CheckBox Cheked event, changes the client side property in viewmodel and recieve new values to chart
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CheckBox_Unchecked_Client(object sender, RoutedEventArgs e)
         {
             var deletedproject = ((EditChartViewModel)DataContext).Projects.Where(w => w.Project.ClientID == MainWindow.helper.ClientService.GetByName(((CheckBox)sender).Content.ToString()).Id);
@@ -131,6 +154,9 @@ namespace Toggl_API.UserWindows.EditChart
 
         }
 
+        /// <summary>
+        /// Function that refreshs chart 
+        /// </summary>
         private void RefreshChart()
         {
 
@@ -140,6 +166,9 @@ namespace Toggl_API.UserWindows.EditChart
 
         }
 
+        /// <summary>
+        /// Function that refreshs local projects and viewmodel data context 
+        /// </summary>
         public void Refresh()
         {
             editChartViewModel = new EditChartViewModel(MainWindow.MainWindowProjects, MainWindow.helper);
