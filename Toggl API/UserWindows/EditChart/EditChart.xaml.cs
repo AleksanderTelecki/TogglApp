@@ -161,13 +161,13 @@ namespace Toggl_API.UserWindows.EditChart
         {
 
             MainWindow mainWindow = (MainWindow)this.Owner;
-            mainWindow.RefreshChart(localProjects);
+            mainWindow.Refresh(localProjects);
 
 
         }
 
         /// <summary>
-        /// Function that refreshs local projects and viewmodel data context 
+        /// Function that refreshs local projects and viewmodel data context of edit window
         /// </summary>
         public void Refresh()
         {

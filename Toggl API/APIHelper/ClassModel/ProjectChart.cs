@@ -218,7 +218,7 @@ namespace Toggl_API.APIHelper.ClassModel
         public List<DateTime> GetDistinctDate()
         {
 
-            var dateDistinct = TimePerTasks.Select(o => o.ShortDateString).Distinct().ToList();
+            var dateDistinct = TimePerTasks.Select(o => o.Date.Date).Distinct().ToList();
             List<DateTime> dateTimes = new List<DateTime>();
             foreach (var item in dateDistinct)
             {
@@ -237,7 +237,7 @@ namespace Toggl_API.APIHelper.ClassModel
         public ProjectChart GetProjectByDate(DateTime dateTime)
         {
             ProjectChart projectChart = new ProjectChart(ProjectName, ProjectID);
-            projectChart.TimePerTasks = this.TimePerTasks.Where(w => w.ShortDateString == dateTime.ToShortDateString()).ToList();
+            projectChart.TimePerTasks = this.TimePerTasks.Where(w => w.Date.Date == dateTime.Date).ToList();
 
             return projectChart;
 
@@ -252,8 +252,6 @@ namespace Toggl_API.APIHelper.ClassModel
         public double Time { get; set; }
 
         public DateTime Date { get; set; }
-
-        public string ShortDateString { get => Date.ToShortDateString(); }
 
 
         public TimePerTask(string description,double time, DateTime date)

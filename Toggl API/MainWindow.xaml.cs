@@ -171,15 +171,7 @@ namespace Toggl_API
 
         #region ChartImplementation
 
-        /// <summary>
-        /// Function that refresh chart from edit window
-        /// </summary>
-        /// <param name="projectCharts"></param>
-        public void RefreshChart(List<ProjectChart> projectCharts)
-        {
-
-            LoadBarChartData(projectCharts);
-        }
+      
 
 
         /// <summary>
@@ -673,6 +665,16 @@ namespace Toggl_API
             UpdateDateWithoutPickerTriggers((DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
         }
 
+        /// <summary>
+        /// Function that refresh chart from edit window
+        /// </summary>
+        /// <param name="projectCharts"></param>
+        public void Refresh(List<ProjectChart> projectCharts)
+        {
+
+            LoadBarChartData(projectCharts);
+        }
+
 
         /// <summary>
         /// EventHandler for 'Refresh' menuitem click, refreshs chart values
@@ -682,8 +684,9 @@ namespace Toggl_API
         private void Refresh_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             Refresh();
-      
+
         }
+
 
 
 

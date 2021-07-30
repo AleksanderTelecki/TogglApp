@@ -42,7 +42,7 @@ namespace Toggl_API.APIHelper.ClassModel
         public System.Drawing.Color GetCurrentColor()
         {
 
-            return System.Drawing.Color.FromArgb(this.Color.A, this.Color.R, this.Color.G, this.Color.B); ;
+            return System.Drawing.Color.FromArgb(this.Color.A, this.Color.R, this.Color.G, this.Color.B);
         }
 
 
