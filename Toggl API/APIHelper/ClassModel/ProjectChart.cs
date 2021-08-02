@@ -18,11 +18,18 @@ namespace Toggl_API.APIHelper.ClassModel
 
         public int ClientID { get; set; }
 
+
+        //Chart Information
+        #region Chart Settings
         public double X { get; set; }
+        public double[] Xs { get; set;} 
 
         public double Y { get; set; }
-        public double BarWidth { get; set; }
+        public double[] Ys { get; set;}
 
+        public DateTime[] Dates { get; set; }
+        public double BarWidth { get; set; }
+        #endregion
 
         public ProjectChart(string projectName,List<TimePerTask> timepertasks,int id)
         {
@@ -82,7 +89,7 @@ namespace Toggl_API.APIHelper.ClassModel
                 sum += item.Time;
             }
 
-            return Math.Round(sum * 4, MidpointRounding.ToEven) / 4;
+            return sum!=0?Math.Round(sum * 4, MidpointRounding.ToEven) / 4:0;
 
         }
 
@@ -172,8 +179,40 @@ namespace Toggl_API.APIHelper.ClassModel
 
         }
 
+        public string TasksToPointLabel(DateTime date)
+        {
 
-       
+            StringBuilder sb = new StringBuilder();
+            int taskswithoutnames = 0;
+            sb.AppendLine($"<<{ProjectName}>>");
+            foreach (var item in TimePerTasks.Where(w=>w.Date.Date==date))
+            {
+
+                if (String.IsNullOrEmpty(item.Description))
+                {
+                    taskswithoutnames++;
+                }
+                else
+                {
+                    sb.AppendLine($"{item.Description}");
+                }
+
+
+
+            }
+
+            if (taskswithoutnames != 0)
+            {
+
+                sb.AppendLine($"{taskswithoutnames} - Task Without Description");
+            }
+
+            return sb.ToString();
+
+        }
+
+
+
         /// <summary>
         ///  Method that converts task descriptions to cvs format by specified date
         /// </summary>

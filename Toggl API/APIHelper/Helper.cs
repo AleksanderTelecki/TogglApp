@@ -99,6 +99,9 @@ namespace Toggl_API.APIHelper
         }
 
 
+
+
+
         /// <summary>
         /// Method that updates colors in color.json and projectColors
         /// </summary>

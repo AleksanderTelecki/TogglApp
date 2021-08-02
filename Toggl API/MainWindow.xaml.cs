@@ -40,6 +40,8 @@ namespace Toggl_API
     {
 
         #region GlobalVariables
+        private enum PlotType {ByHours,ByDate};
+        private PlotType _PlotType;
         public static Helper helper;//Helper Class
         public static ObservableCollection<ProjectChart> MainWindowProjects;//Observable Collection for editing chart and bar tooltip
         public EditChart editChart;//Edit window instance
@@ -81,6 +83,8 @@ namespace Toggl_API
             notifyIcon.Icon = new System.Drawing.Icon(iconStream);
             notifyIcon.Click += notifyIcon_Click;
 
+            PlotType_Combo.SelectedIndex = 0;
+
         }
 
         /// <summary>
@@ -90,7 +94,7 @@ namespace Toggl_API
         {
             var projects = await helper.GetProjectChartAsync(DatePick_Start.SelectedDate, DatePick_End.SelectedDate);
             MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
-            LoadBarChartData(projects);
+            LoadBarChartData(projects, (DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
         }
 
         #region AppToTrayImplementation
@@ -178,12 +182,16 @@ namespace Toggl_API
         /// Main function that visualizes the data received 
         /// </summary>
         /// <param name="projects"></param>
-        private void LoadBarChartData(List<ProjectChart> projects)
+        private void LoadBarChartData(List<ProjectChart> projects,DateTime start,DateTime end)
         {
 
             WpfPlot.Plot.Clear();
             WpfPlot.Plot.Title("");
+            WpfPlot.Plot.Legend(false);
             WpfPlot.Plot.XTicks(new string[] { });
+
+
+
 
             if (projects.Count==0)
             {
@@ -191,55 +199,142 @@ namespace Toggl_API
                 return;
             }
 
+
+
             Random rnd = new Random();
-          
-            //initialize
-            List<double> initbarcount = new List<double>();
-            List<double> initpositions = new List<double>();
-            List<string> lables = new List<string>();
-            List<double> timesums = new List<double>();
-            List<int> ids = new List<int>();
-            int counter = 0;
 
-            foreach (var item in projects)
+            switch (_PlotType)
             {
-                initbarcount.Add(0);
-                initpositions.Add(counter);
-                lables.Add(item.ProjectName);
-                timesums.Add(item.TimeSum);
-                ids.Add(item.ProjectID);
-                counter++;
+                case PlotType.ByHours:
+                    //initialize
+                    List<double> initbarcount = new List<double>();
+                    List<double> initpositions = new List<double>();
+                    List<string> lables = new List<string>();
+                    List<double> timesums = new List<double>();
+                    List<int> ids = new List<int>();
+                    int counter = 0;
 
+                    foreach (var item in projects)
+                    {
+                        initbarcount.Add(0);
+                        initpositions.Add(counter);
+                        lables.Add(item.ProjectName);
+                        timesums.Add(item.TimeSum);
+                        ids.Add(item.ProjectID);
+                        counter++;
+
+                    }
+
+
+                    WpfPlot.Plot.AddBar(initbarcount.ToArray(), initpositions.ToArray());
+                    WpfPlot.Plot.XTicks(initpositions.ToArray(), lables.ToArray());
+                    WpfPlot.Plot.XAxis.TickLabelStyle(rotation: 30);
+
+                    for (int j = 0; j < initbarcount.ToArray().Length; j++)
+                    {
+
+                        var bar = WpfPlot.Plot.AddBar(new double[] { timesums[j] }, new double[] { initpositions[j] });
+                        bar.ShowValuesAboveBars = true;
+                        bar.FillColor = helper.GetColor(ids[j]);
+                        bar.Label = lables[j];
+                        var project = MainWindowProjects.First(w => w.ProjectID == ids[j]);
+                        project.X = initpositions[j];
+                        project.Y = timesums[j];
+                        project.BarWidth = bar.BarWidth;
+
+
+                    }
+
+
+                    WpfPlot.Plot.YLabel("Hours");
+                    WpfPlot.Plot.Title($"Total Hours: {timesums.Sum()}");
+                    WpfPlot.Plot.SetAxisLimits(yMin: 0);
+
+                    break;
+                case PlotType.ByDate:
+                    List<double[]> initgroupvalues = new List<double[]>();
+                    List<DateTime> initdates = new List<DateTime>();
+
+                    DateTime listdate = start.Date;
+                    for (int i = 0; listdate < end; i++)
+                    {
+                        initdates.Add(listdate);
+                        listdate = listdate.AddDays(1);
+
+                    }
+
+                    foreach (var item in projects)
+                    {
+                        DateTime dateTime = start.Date;
+                        List<double> array = new List<double>();
+
+                        for (int i = 0; dateTime < end; i++)
+                        {
+                            double value = item.GetTimeSum(dateTime);
+                            if (value==0)
+                            {
+                                value = double.NaN;
+                            }
+                            array.Add(value);
+                            dateTime = dateTime.AddDays(1);
+                        }
+
+                        initgroupvalues.Add(array.ToArray());
+
+                    }
+
+
+                    var bars = WpfPlot.Plot.AddBarGroups(initdates.Select(w => w.Date.ToShortDateString()).ToArray(), projects.Select(w => w.ProjectName).ToArray(), initgroupvalues.ToArray(), null);
+
+                    foreach (var item in bars)
+                    {
+                        int id = projects.Find(w => w.ProjectName == item.Label).ProjectID;
+                        item.FillColor = helper.GetColor(id);
+                        item.ShowValuesAboveBars = true;
+                        var project = MainWindowProjects.First(w => w.ProjectID == id);
+                        project.Xs = (double[])item.Positions.Clone();
+                        for (int i = 0; i < project.Xs.Length; i++)
+                        {
+                            project.Xs[i] += item.PositionOffset;
+                        }
+                        project.Ys = item.Values;
+                        project.BarWidth = item.BarWidth;
+                        project.Dates = initdates.ToArray();
+
+                    }
+
+
+
+                    WpfPlot.Plot.YLabel("Hours");
+                    WpfPlot.Plot.Title($"Total Hours: {projects.Select(w=>w.TimeSum).ToArray().Sum()}");
+                    WpfPlot.Plot.Legend(location: Alignment.UpperRight);
+                    WpfPlot.Plot.XAxis.TickLabelStyle(rotation: 0);
+                    WpfPlot.Plot.SetAxisLimits(yMin: 0);
+
+                    break;
+                default:
+                    break;
             }
 
-
-            WpfPlot.Plot.AddBar(initbarcount.ToArray(), initpositions.ToArray());
-            WpfPlot.Plot.XTicks(initpositions.ToArray(), lables.ToArray());
-            WpfPlot.Plot.XAxis.TickLabelStyle(rotation: 30);
             
-            for (int j = 0; j < initbarcount.ToArray().Length; j++)
-            {
-
-                var bar = WpfPlot.Plot.AddBar(new double[] {timesums[j] }, new double[] { initpositions[j] });
-                bar.ShowValuesAboveBars = true;
-                bar.FillColor = helper.GetColor(ids[j]);
-                bar.Label = lables[j];
-                var project = MainWindowProjects.First(w => w.ProjectID == ids[j]);
-                project.X = initpositions[j];
-                project.Y = timesums[j];
-                project.BarWidth = bar.BarWidth;
 
 
-            }
 
-            
-            WpfPlot.Plot.YLabel("Hours");
-            WpfPlot.Plot.Title($"Total Hours: {timesums.Sum()}");
-            WpfPlot.Plot.SetAxisLimits(yMin: 0);
+
+
+
 
             LoadingIndicator.IsActive = false;
 
 
+
+
+        }
+
+        private void PlotType_Combo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _PlotType = (PlotType)PlotType_Combo.SelectedIndex;
+            Refresh();
 
 
         }
@@ -254,35 +349,80 @@ namespace Toggl_API
         {
 
             (double x, double y) = WpfPlot.GetMouseCoordinates();
-            
-            foreach (var project in MainWindowProjects)
+
+
+            switch (_PlotType)
             {
-                var px = project.X;
-                var py = project.Y;
-                var barwidth = project.BarWidth/2;
+                case PlotType.ByHours:
+                    foreach (var project in MainWindowProjects)
+                    {
+                        var px = project.X;
+                        var py = project.Y;
+                        var barwidth = project.BarWidth / 2;
 
-                bool exist_x = (x >= (px - barwidth) && x <= (px + barwidth));
-                bool exist_y = (y >= 0 && y <= py);
+                        bool exist_x = (x >= (px - barwidth) && x <= (px + barwidth));
+                        bool exist_y = (y >= 0 && y <= py);
 
-                if (exist_x && exist_y)
-                {
-                   
-                    TextBox textBox = new TextBox();
-                    textBox.Text = $"{project.TasksToPointLabel()}";
-                    PlotPopUp.Child = null;
-                    PlotPopUp.Child = textBox;
-                    PlotPopUp.IsOpen = true;
+                        if (exist_x && exist_y)
+                        {
 
-                    return;
-                    
-                   
-                }
-               
-                
-               
+                            TextBox textBox = new TextBox();
+                            textBox.Text = $"{project.TasksToPointLabel()}";
+                            PlotPopUp.Child = null;
+                            PlotPopUp.Child = textBox;
+                            PlotPopUp.IsOpen = true;
+
+                            return;
+
+
+                        }
+
+
+
+                    }
+
+                    PlotPopUp.IsOpen = false;
+                    break;
+                case PlotType.ByDate:
+                    foreach (var project in MainWindowProjects)
+                    {
+                        var px = project.Xs;
+                        var py = project.Ys;
+                        var barwidth = project.BarWidth / 2;
+
+                        for (int i = 0; i < px.Length; i++)
+                        {
+                            bool exist_x = (x >= (px[i] - barwidth) && x <= (px[i] + barwidth));
+                            bool exist_y = (y >= 0 && y <= py[i]);
+
+                            if (exist_x && exist_y)
+                            {
+
+                                TextBox textBox = new TextBox();
+                                textBox.Text = $"{project.TasksToPointLabel(project.Dates[i])}";
+                                PlotPopUp.Child = null;
+                                PlotPopUp.Child = textBox;
+                                PlotPopUp.IsOpen = true;
+
+                                return;
+
+
+                            }
+                        }
+
+                       
+
+
+
+                    }
+
+                    PlotPopUp.IsOpen = false;
+                    break;
+                default:
+                    break;
             }
 
-            PlotPopUp.IsOpen = false;
+          
 
 
 
@@ -315,7 +455,7 @@ namespace Toggl_API
                 {
                     editChart.Refresh();
                 }
-                LoadBarChartData(projects);
+                LoadBarChartData(projects, (DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
 
                 oldDate.Start = DatePick_Start.SelectedDate;
             }
@@ -347,7 +487,7 @@ namespace Toggl_API
                 {
                     editChart.Refresh();
                 }
-                LoadBarChartData(projects);
+                LoadBarChartData(projects, (DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
                 oldDate.End = DatePick_End.SelectedDate;
             }
         }
@@ -369,7 +509,7 @@ namespace Toggl_API
             LoadingIndicator.IsActive = true;
             var projects = await helper.GetProjectChartAsync(startDate, endDate);
             MainWindowProjects = new ObservableCollection<ProjectChart>(projects);
-            LoadBarChartData(projects);
+            LoadBarChartData(projects, (DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
             DatePick_End.SelectedDateChanged += DatePick_End_SelectedDateChanged;
             DatePick_Start.SelectedDateChanged += DatePick_Start_SelectedDateChanged;
 
@@ -672,7 +812,7 @@ namespace Toggl_API
         public void Refresh(List<ProjectChart> projectCharts)
         {
 
-            LoadBarChartData(projectCharts);
+            LoadBarChartData(projectCharts, (DateTime)DatePick_Start.SelectedDate, (DateTime)DatePick_End.SelectedDate);
         }
 
 
@@ -687,8 +827,6 @@ namespace Toggl_API
 
         }
 
-
-
-
+        
     }
 }

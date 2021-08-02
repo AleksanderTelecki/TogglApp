@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Toggl_API"
         xmlns:loadin="clr-namespace:LoadingIndicators.WPF;assembly=LoadingIndicators.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Icon="/Resources/StackedColumnSeries.ico" Height="450" Width="660" Closing="Window_Closing" StateChanged="Window_StateChanged" IsVisibleChanged="Window_IsVisibleChanged" >
+        Title="MainWindow" Icon="/Resources/StackedColumnSeries.ico" Height="450" Width="740" Closing="Window_Closing" StateChanged="Window_StateChanged" IsVisibleChanged="Window_IsVisibleChanged" >
    
     <Window.Resources>
         <ResourceDictionary>
@@ -29,6 +29,7 @@
                 <MenuItem Header="Edit Color" Name="Edit_Color_MenuItem" Click="Edit_Color_MenuItem_Click"/>
                 <MenuItem Header="Edit Chart" Name="Edit_Chart_MenuItem" Click="Edit_Chart_MenuItem_Click"/>
             </MenuItem>
+        
         </Menu>
         <Grid DockPanel.Dock="Bottom">
             <Grid.RowDefinitions>
@@ -59,6 +60,10 @@
                     <StackPanel Margin="10 0 0 0" Orientation="Vertical" HorizontalAlignment="Left">
                         <TextBlock/>
                         <StackPanel Orientation="Horizontal">
+                            <ComboBox Name="PlotType_Combo" SelectionChanged="PlotType_Combo_SelectionChanged">
+                                <ComboBoxItem Content="By Hours"/>
+                                <ComboBoxItem Content="ByDates"/>
+                            </ComboBox>
                             <Button x:Name="CurrMonth_Button" Click="CurrMonth_Button_Click" VerticalAlignment="Center" Margin="5 0 0 0" Width="95" Height="22" HorizontalAlignment="Center" Content="Current Month"/>
                             <Button x:Name="CurrWeek_Button" Click="CurrWeek_Button_Click" VerticalAlignment="Center" Margin="5 0 0 0" Width="95"  Height="22" HorizontalAlignment="Center" Content="Current Week"/>
                             <Button x:Name="CurrDay_Button" Click="CurrDay_Button_Click" VerticalAlignment="Center" Margin="5 0 0 0" Width="95"  Height="22" HorizontalAlignment="Center" Content="Current Day"/>
